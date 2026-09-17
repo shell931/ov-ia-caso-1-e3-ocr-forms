@@ -1,0 +1,161 @@
+name: caso1v2e3
+
+x-app-env: &app-env
+  RABBIT_URL: amqp://guest:guest@rabbitmq:5672/
+  DATA_DIR: /data/e3
+  VLLM_URL: http://vllm:8000/v1
+  VLLM_VL_URL: http://vllm-vl:8000/v1
+  VLLM_VL_MODEL: Qwen/Qwen2.5-VL-7B-Instruct
+  NLP_MODEL: Qwen/Qwen2.5-7B-Instruct-AWQ
+
+services:
+  # ═══════════════════════════════════════════════════════════
+  #  RABBITMQ - Gestor de colas
+  # ═══════════════════════════════════════════════════════════
+  rabbitmq:
+    image: rabbitmq:3.13-management
+    container_name: caso1v2e3e3-rabbitmq
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    environment:
+      RABBITMQ_DEFAULT_USER: guest
+      RABBITMQ_DEFAULT_PASS: guest
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "-q", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 8
+    restart: unless-stopped
+    volumes:
+      - rabbit-data:/var/lib/rabbitmq
+
+  # ═══════════════════════════════════════════════════════════
+  #  VLLM - GPU 1 - NLP Model (Qwen2.5-7B-Instruct-AWQ)
+  # ═══════════════════════════════════════════════════════════
+  vllm:
+    profiles: ["gpu"]
+    image: vllm/vllm-openai:latest
+    container_name: caso1v2e3e3-vllm-nlp
+    runtime: nvidia
+    ipc: host
+    ports:
+      - "8000:8000"
+    environment:
+      NVIDIA_VISIBLE_DEVICES: "1"
+      HF_HOME: /root/.cache/huggingface
+    volumes:
+      - /data/hf-cache:/root/.cache/huggingface
+    command:
+      - --model
+      - Qwen/Qwen2.5-7B-Instruct-AWQ
+      - --gpu-memory-utilization
+      - "0.40"
+      - --max-model-len
+      - "8192"
+      - --max-num-seqs
+      - "32"
+      - --enforce-eager
+    restart: unless-stopped
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              device_ids: ["1"]
+              capabilities: [gpu]
+
+  # ═══════════════════════════════════════════════════════════
+  #  VLLM-VL - GPU 0 - Vision Model (Qwen2.5-VL-7B-Instruct)
+  # ═══════════════════════════════════════════════════════════
+  vllm-vl:
+    profiles: ["gpu"]
+    image: vllm/vllm-openai:latest
+    container_name: caso1v2e3e3-vllm-vl
+    runtime: nvidia
+    ipc: host
+    ports:
+      - "8001:8000"
+    environment:
+      NVIDIA_VISIBLE_DEVICES: "0"
+      HF_HOME: /root/.cache/huggingface
+    volumes:
+      - /data/hf-cache:/root/.cache/huggingface
+    command:
+      - --model
+      - Qwen/Qwen2.5-VL-7B-Instruct
+      - --gpu-memory-utilization
+      - "0.90"
+      - --max-model-len
+      - "4096"
+      - --enforce-eager
+      - --max-num-seqs
+      - "8"
+    restart: unless-stopped
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              device_ids: ["0"]
+              capabilities: [gpu]
+
+  # ═══════════════════════════════════════════════════════════
+  #  OCR WORKERS - 8 workers (CPU/GPU 0)
+  # ═══════════════════════════════════════════════════════════
+  ocr:
+    image: python:3.11-slim
+    container_name: caso1v2e3e3-ocr
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+      vllm-vl:
+        condition: service_started
+    environment:
+      <<: *app-env
+    volumes:
+      - ./workers:/app
+      - /data/e3:/data/e3:ro
+    working_dir: /app
+    command: >
+      bash -c "
+        pip install -q -r requirements.txt &&
+        for i in {1..8}; do
+          python -u ocr_worker.py &
+        done &&
+        wait
+      "
+    restart: unless-stopped
+    deploy:
+      replicas: 1
+
+  # ═══════════════════════════════════════════════════════════
+  #  NLP WORKERS - 12 workers (CPU)
+  # ═══════════════════════════════════════════════════════════
+  nlp:
+    image: python:3.11-slim
+    container_name: caso1v2e3e3-nlp
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+      vllm:
+        condition: service_started
+    environment:
+      <<: *app-env
+    volumes:
+      - ./workers:/app
+    working_dir: /app
+    command: >
+      bash -c "
+        pip install -q -r requirements.txt &&
+        for i in {1..12}; do
+          python -u nlp_worker.py &
+        done &&
+        wait
+      "
+    restart: unless-stopped
+    deploy:
+      replicas: 1
+
+volumes:
+  rabbit-data:

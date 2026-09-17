@@ -1,0 +1,26 @@
+.venv/
+__pycache__/
+*.pyc
+.env
+caso-1-v2/data/
+backups/visor-g7e/
+*.tif
+*.tiff
+gold.csv
+gold.json
+.DS_Store
+video-analisis-thomas/frames/
+fixtures/**/*.jpg
+fixtures/**/*.jpeg
+fixtures/**/*.png
+
+# Artefactos pesados: se regeneran desde los scripts, no se versionan
+video-analisis-thomas/frames-early/
+video-analisis-thomas/frames-mid/
+*.wav
+*.pdf
+backups/lote-1251/lote-1251.json
+e3-github/docs/data/vault.json
+
+# Repo git independiente, se clona aparte
+e3-pages-public/

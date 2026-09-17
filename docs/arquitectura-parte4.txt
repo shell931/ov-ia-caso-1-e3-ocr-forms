@@ -1,0 +1,146 @@
+```
+╔════════════════════════════════════════════════════════════════════════════╗
+║                    ARQUITECTURA CASO 1 V2 - PARTE 4                        ║
+║                        2× RTX PRO 6000 Ada (96 GB c/u)                     ║
+╚════════════════════════════════════════════════════════════════════════════╝
+
+┌─────────────────────────────────────────────────────────────────────────────┐
+│  ┌─────────────────────────────────────────────────────────────────────┐   │
+│  │                          RABBITMQ (:5672)                            │   │
+│  │                    Gestor de colas + monitoring                      │   │
+│  └──────────────────┬──────────────────────┬──────────────────────────┘   │
+│                     │                       │                               │
+│          ┌──────────▼──────────┐  ┌────────▼─────────────┐                │
+│          │   ocr_input queue   │  │  ocr_output queue    │                │
+│          └─────────┬────────────┘  └──────────┬───────────┘                │
+│                    │                           │                            │
+│   ┌────────────────▼───────────────────────────▼───────────────────────┐   │
+│   │                      8× OCR WORKERS (CPU)                          │   │
+│   │                                                                     │   │
+│   │  ┌───────────────────────────────────────────────────────────┐    │   │
+│   │  │  FOR EACH DOCUMENT:                                       │    │   │
+│   │  │  1. Leer imagen TIFF desde /data/e3/front/               │    │   │
+│   │  │  2. Enviar a vLLM-VL (GPU 0) ──────────────────┐         │    │   │
+│   │  │  3. Obtener texto OCR completo                 │         │    │   │
+│   │  │  4. Publicar a ocr_output queue                │         │    │   │
+│   │  └────────────────────────────────────────────────┼─────────┘    │   │
+│   └─────────────────────────────────────────────────────────────────┘     │
+│                                                       │                     │
+│                                    ┌──────────────────▼─────────────────┐  │
+│                                    │  GPU 0 (96 GB VRAM)                │  │
+│                                    │                                    │  │
+│                                    │  vLLM-VL (:8001)                   │  │
+│                                    │  Qwen2.5-VL-7B-Instruct            │  │
+│                                    │                                    │  │
+│                                    │  VISIÓN / OCR                      │  │
+│                                    │  • Lee formularios E3/E4           │  │
+│                                    │  • Extrae texto completo           │  │
+│                                    │  • Max 8 concurrent requests       │  │
+│                                    │  • VRAM: ~42 GB                    │  │
+│                                    └────────────────────────────────────┘  │
+│                                                                             │
+│                           ┌────────────────────┐                            │
+│                           │  nlp_input queue   │                            │
+│                           └──────────┬─────────┘                            │
+│                                      │                                      │
+│   ┌──────────────────────────────────▼──────────────────────────────────┐  │
+│   │                     12× NLP WORKERS (CPU)                           │  │
+│   │                                                                     │  │
+│   │  ┌───────────────────────────────────────────────────────────┐    │  │
+│   │  │  FOR EACH DOCUMENT:                                       │    │  │
+│   │  │  1. Recibir texto OCR completo                            │    │  │
+│   │  │  2. Enviar a vLLM (GPU 1) ─────────────────────┐          │    │  │
+│   │  │  3. Obtener JSON campos estructurados          │          │    │  │
+│   │  │  4. 🚀 APLICAR POST-PROCESAMIENTO 🚀           │          │    │  │
+│   │  │     • corregir_direccion()                     │          │    │  │
+│   │  │     • corregir_telefono()                      │          │    │  │
+│   │  │     • corregir_email()                         │          │    │  │
+│   │  │     • corregir_ciudad()                        │          │    │  │
+│   │  │     • corregir_nombre()                        │          │    │  │
+│   │  │  5. Publicar a nlp_output queue                │          │    │  │
+│   │  └────────────────────────────────────────────────┼──────────┘    │  │
+│   └─────────────────────────────────────────────────────────────────┘     │
+│                                                       │                     │
+│                                    ┌──────────────────▼─────────────────┐  │
+│                                    │  GPU 1 (96 GB VRAM)                │  │
+│                                    │                                    │  │
+│                                    │  vLLM (:8000)                      │  │
+│                                    │  Qwen2.5-7B-Instruct-AWQ           │  │
+│                                    │                                    │  │
+│                                    │  NLP / EXTRACCIÓN                  │  │
+│                                    │  • Parsea texto OCR                │  │
+│                                    │  • Extrae campos estructurados     │  │
+│                                    │  • Max 32 concurrent requests      │  │
+│                                    │  • VRAM: ~33 GB                    │  │
+│                                    └────────────────────────────────────┘  │
+│                                                                             │
+│                           ┌────────────────────┐                            │
+│                           │  nlp_output queue  │                            │
+│                           │                    │                            │
+│                           │  ✅ RESULTADOS     │                            │
+│                           │  • doc_id          │                            │
+│                           │  • campos[]        │                            │
+│                           │  • confianza       │                            │
+│                           │  • postprocesado   │                            │
+│                           └────────────────────┘                            │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+╔════════════════════════════════════════════════════════════════════════════╗
+║                              📊 MÉTRICAS                                    ║
+╠════════════════════════════════════════════════════════════════════════════╣
+║  Throughput:          ~1,700 docs/h @ 20 concurrent                        ║
+║  Latency (p95):       ~3.5s/doc (OCR: 1.8s + NLP: 1.7s)                   ║
+║  VRAM GPU 0:          42 GB / 96 GB (VL-7B)                                ║
+║  VRAM GPU 1:          33 GB / 96 GB (NLP-7B AWQ)                           ║
+║  Workers:             8 OCR + 12 NLP = 20 total                            ║
+║                                                                             ║
+║  📈 CALIDAD (CON POST-PROCESAMIENTO):                                      ║
+║  ├─ Confianza Real:        ≥80% (antes: 72.6%)                             ║
+║  ├─ Brecha Sobrevaloración: ≤15 pts (antes: +20.7)                         ║
+║  ├─ Falsos 100%:           ≤1,500 (antes: 2,747)                           ║
+║  └─ Campos críticos:       -50% errores (direccion, telefono, email)       ║
+╚════════════════════════════════════════════════════════════════════════════╝
+
+╔════════════════════════════════════════════════════════════════════════════╗
+║                     🚀 POST-PROCESAMIENTO EXPRESS                          ║
+╠════════════════════════════════════════════════════════════════════════════╣
+║  TOP 5 CAMPOS CORREGIDOS:                                                  ║
+║                                                                             ║
+║  1. DIRECCION (740 errores → -50%)                                         ║
+║     ❌ C11+389-13              →  ✅ Cll 73 # 89-13                        ║
+║     ❌ cl1 690# 72 038 508     →  ✅ Cll 69 D # 72 C 38 Sur                ║
+║                                                                             ║
+║  2. TELEFONO_MOVIL (673 errores → -50%)                                    ║
+║     ❌ 3222940576              →  ✅ 3222940                                ║
+║     ❌ 320 456 7890            →  ✅ 3204567890                             ║
+║                                                                             ║
+║  3. EMAIL (375 errores → -50%)                                             ║
+║     ❌ tatianaivr64@cutlook.can  →  ✅ tatianaivr64@outlook.com            ║
+║     ❌ user@gimal.cam          →  ✅ user@gmail.com                        ║
+║                                                                             ║
+║  4. CIUDAD (311 errores → -50%)                                            ║
+║     ❌ Bo50.t3                 →  ✅ Bogota                                 ║
+║     ❌ FPANCA·FONTIRON         →  ✅ Bogota                                 ║
+║                                                                             ║
+║  5. NOMBRES (234-174 errores → -50%)                                       ║
+║     ❌ Juan1                   →  ✅ Juan                                   ║
+║     ❌ Natalia.                →  ✅ Natalia                                ║
+║                                                                             ║
+║  IMPACTO TOTAL: +7.4% confianza real (72.6% → 80%+)                       ║
+╚════════════════════════════════════════════════════════════════════════════╝
+
+╔════════════════════════════════════════════════════════════════════════════╗
+║                        🔧 DEPLOYMENT CHECKLIST                             ║
+╠════════════════════════════════════════════════════════════════════════════╣
+║  ☐ 1. Clonar repo: git pull origin main                                   ║
+║  ☐ 2. Deploy:     ./scripts/deploy_completo_aws.sh                        ║
+║  ☐ 3. Verificar:  nvidia-smi (VRAM ~42GB + ~33GB)                         ║
+║  ☐ 4. Verificar:  curl localhost:8000/v1/models                           ║
+║  ☐ 5. Verificar:  curl localhost:8001/v1/models                           ║
+║  ☐ 6. Test:       ./scripts/test_mejoras.sh                               ║
+║  ☐ 7. Monitor:    http://3.17.139.133:15672 (RabbitMQ)                    ║
+║  ☐ 8. Logs:       sudo docker compose logs -f ocr nlp                     ║
+║  ☐ 9. Comparar:   python compare_gold.py (conf_real ≥80%)                 ║
+║  ☐ 10. Guardar:   Descargar CSVs antes de apagar servidor                 ║
+╚════════════════════════════════════════════════════════════════════════════╝
+```
