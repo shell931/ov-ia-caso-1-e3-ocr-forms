@@ -219,6 +219,54 @@ def corregir_nombre(texto: str) -> str:
     return resultado
 
 
+def corregir_fecha(texto: str) -> str:
+    """Normaliza fechas al formato del gold: DD/MM/YYYY.
+
+    El LLM tiende a devolver ISO (YYYY-MM-DD); el gold usa DD/MM/YYYY.
+    Sin esta correccion, TODAS las fechas cuentan como error (campo estricto).
+    """
+    if not texto or not str(texto).strip():
+        return texto
+    s = str(texto).strip()
+    # ISO: YYYY-MM-DD o YYYY/MM/DD
+    m = re.search(r'\b(\d{4})[-/](\d{1,2})[-/](\d{1,2})\b', s)
+    if m:
+        y, mo, d = m.groups()
+        return f"{int(d):02d}/{int(mo):02d}/{y}"
+    # DD-MM-YYYY o DD/MM/YYYY -> normalizar separador y padding
+    m = re.search(r'\b(\d{1,2})[-/](\d{1,2})[-/](\d{4})\b', s)
+    if m:
+        d, mo, y = m.groups()
+        return f"{int(d):02d}/{int(mo):02d}/{y}"
+    return s
+
+
+# Mapea abreviaturas del modelo al vocabulario canonico del gold.
+TIPO_DOC_MAP = {
+    'CC': 'CEDULA_CIUDADANIA',
+    'CE': 'CEDULA_EXTRANJERIA',
+    'TI': 'TARJETA_IDENTIDAD',
+    'PA': 'PASAPORTE',
+    'PAS': 'PASAPORTE',
+    'PP': 'PASAPORTE',
+    'RC': 'REGISTRO_CIVIL',
+    'NIP': 'NIP',
+    'NUIP': 'NUIP',
+}
+
+
+def corregir_tipo_documento(texto: str) -> str:
+    """Convierte 'CC' -> 'CEDULA_CIUDADANIA', etc. (formato del gold)."""
+    if not texto or not str(texto).strip():
+        return texto
+    t = str(texto).strip().upper().replace('.', '').strip()
+    key = re.sub(r'[^A-Z]', '', t)
+    if key in TIPO_DOC_MAP:
+        return TIPO_DOC_MAP[key]
+    # Si ya viene en formato largo (CEDULA_CIUDADANIA), normalizar separadores
+    return re.sub(r'\s+', '_', t)
+
+
 def postprocesar_campos_express(campos: list) -> list:
     """
     Aplica correcciones post-procesamiento a campos extraídos.
@@ -262,7 +310,13 @@ def postprocesar_campos_express(campos: list) -> list:
         elif etiqueta in ['primer_nombre', 'segundo_nombre', 
                           'primer_apellido', 'segundo_apellido']:
             valor_corregido = corregir_nombre(valor_original)
-        
+
+        elif etiqueta in ['fecha_inscripcion', 'fecha_expedicion']:
+            valor_corregido = corregir_fecha(valor_original)
+
+        elif etiqueta == 'tipo_documento':
+            valor_corregido = corregir_tipo_documento(valor_original)
+
         else:
             # No tocar otros campos
             campos_corregidos.append(campo)

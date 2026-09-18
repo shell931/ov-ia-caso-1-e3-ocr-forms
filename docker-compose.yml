@@ -87,7 +87,7 @@ services:
       - --gpu-memory-utilization
       - "0.90"
       - --max-model-len
-      - "4096"
+      - "16384"
       - --enforce-eager
       - --max-num-seqs
       - "8"
