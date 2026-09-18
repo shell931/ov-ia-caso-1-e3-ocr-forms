@@ -35,10 +35,15 @@ INSTRUCCIONES:
 5. Si un campo está vacío, escribe "VACÍO"
 
 IMPORTANTE:
+- Nombres y apellidos: transcribe la ortografía EXACTA que ves. NO completes ni expandas
+  (ej. si ves "alex", escribe "alex", no "alejandro"; no agregues puntos ni letras).
+- Emails: copia carácter por carácter (usuario, @ y dominio) tal como está escrito.
+  NO completes ni expandas el usuario, NO inventes el dominio.
+- Números (documento, teléfonos, fechas, número de formulario): léelos DÍGITO POR DÍGITO
+  con cuidado; no agregues ni quites dígitos; ojo con 0/O, 1/l/7, 5/S, 6/8.
 - Para direcciones: "Cll" no "C11", "#" no "+", separar números y letras
 - Para ciudades: Sin números ni caracteres especiales (ej: "Bogota" no "Bo50.t3")
 - Para teléfonos: Solo dígitos, sin espacios
-- Para emails: Formato válido (@ y .com/net/co)
 
 Transcribe el formulario completo:"""
 
