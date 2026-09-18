@@ -127,6 +127,28 @@ def procesar_nlp(data):
         # ✨ MEJORA: Aplicar post-procesamiento
         campos = postprocesar_campos_express(campos)
 
+        # Votacion de numeros: combina la extraccion NLP con 2 lecturas focalizadas
+        # del VLM (data['numeric_reads']); si un valor coincide en >=2 de las 3
+        # lecturas, se usa ese (reduce errores de digito en cedula/celular).
+        reads = data.get('numeric_reads') or []
+        if reads:
+            from collections import Counter
+            for field in ('numero_documento', 'telefono_movil'):
+                campo = next((c for c in campos if c.get('etiqueta') == field), None)
+                actual = re.sub(r'\D', '', str(campo.get('valor', '')) if campo else '')
+                votos = [actual] + [re.sub(r'\D', '', str(rd.get(field, ''))) for rd in reads]
+                votos = [v for v in votos if v]
+                if not votos:
+                    continue
+                val, cnt = Counter(votos).most_common(1)[0]
+                if cnt >= 2 and val != actual:
+                    if campo is None:
+                        campos.append({'etiqueta': field, 'valor': val,
+                                       'confianza': 85, 'voted': True})
+                    else:
+                        campo['valor'] = val
+                        campo['voted'] = True
+
         # Backfill de formulario_no desde el doc_id (intake): los formularios se
         # nombran por su numero (6000000001.tif -> formulario_no 6000000001), y el
         # VLM lo omite en ~60% de los casos. Solo se rellena si viene vacio.

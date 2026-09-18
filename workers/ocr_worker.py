@@ -48,6 +48,46 @@ IMPORTANTE:
 Transcribe el formulario completo:"""
 
 
+# Prompt focalizado para la doble-pasada de votación de números.
+NUM_PROMPT = """Mira este formulario E3/E4 colombiano y lee con MUCHO cuidado,
+DÍGITO POR DÍGITO, SOLO estos dos números:
+- numero_documento (cédula): solo dígitos
+- telefono_movil (celular): solo dígitos
+Ojo con 0/O, 1/l/7, 5/S, 6/8, 9/4. Si un dato no aparece, déjalo vacío.
+Devuelve SOLO este JSON, sin texto extra:
+{"numero_documento": "...", "telefono_movil": "..."}"""
+
+# Votación de números: 2 lecturas focalizadas extra del VLM (temperaturas
+# distintas) para reducir errores de dígito en numero_documento/telefono_movil.
+VOTE_NUMERIC = os.getenv('VOTE_NUMERIC', '1') == '1'
+
+
+def _leer_numeros_focalizado(img_base64, temp):
+    """Lee solo numero_documento y telefono_movil (digitos). Para votar."""
+    import re as _re
+    import json as _json
+    try:
+        r = client_vl.chat.completions.create(
+            model=VL_MODEL,
+            messages=[{"role": "user", "content": [
+                {"type": "text", "text": NUM_PROMPT},
+                {"type": "image_url", "image_url": {
+                    "url": f"data:image/tiff;base64,{img_base64}"}}]}],
+            max_tokens=128,
+            temperature=temp,
+        )
+        c = r.choices[0].message.content or ""
+        m = _re.search(r'\{.*\}', c, _re.DOTALL)
+        d = _json.loads(m.group(0)) if m else {}
+        return {
+            'numero_documento': _re.sub(r'\D', '', str(d.get('numero_documento', ''))),
+            'telefono_movil': _re.sub(r'\D', '', str(d.get('telefono_movil', ''))),
+        }
+    except Exception as e:
+        logger.warning(f"lectura focalizada fallo (temp={temp}): {e}")
+        return {}
+
+
 def imagen_a_base64(ruta_imagen):
     """Convierte imagen a base64 para enviar a VLM."""
     import base64
@@ -87,12 +127,21 @@ def procesar_ocr_vlm(ruta_imagen):
         elapsed = time.time() - start
         
         logger.info(f"VLM OK - {len(texto)} chars - {elapsed:.2f}s")
-        
-        return {
+
+        salida = {
             'texto_ocr': texto,
             'ocr_time_s': elapsed,
             'ocr_engine': 'vlm'
         }
+
+        # Doble-pasada focalizada para votar numero_documento/telefono_movil.
+        if VOTE_NUMERIC:
+            salida['numeric_reads'] = [
+                _leer_numeros_focalizado(img_base64, 0.3),
+                _leer_numeros_focalizado(img_base64, 0.7),
+            ]
+
+        return salida
         
     except Exception as e:
         logger.error(f"Error VLM: {e}")
