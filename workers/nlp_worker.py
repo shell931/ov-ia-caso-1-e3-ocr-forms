@@ -89,7 +89,9 @@ def procesar_nlp(data):
             'error': 'Sin texto OCR'
         }
     
-    prompt = PROMPT_TEMPLATE.format(texto_ocr=texto_ocr)
+    # El template incluye un ejemplo JSON con llaves literales, por lo que no se
+    # puede usar str.format (interpretaría {"campos": ...} como campos de formato).
+    prompt = PROMPT_TEMPLATE.replace('{texto_ocr}', texto_ocr)
     
     try:
         start = time.time()
