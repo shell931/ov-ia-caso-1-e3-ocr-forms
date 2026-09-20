@@ -11,6 +11,7 @@ from openai import OpenAI
 
 # MEJORA: Importar post-procesamiento
 from postprocess_express import postprocesar_campos_express
+from casillas_vision import aplicar as aplicar_casillas
 
 logging.basicConfig(
     level=logging.INFO,
@@ -126,6 +127,12 @@ def procesar_nlp(data):
         
         # ✨ MEJORA: Aplicar post-procesamiento
         campos = postprocesar_campos_express(campos)
+
+        # Casillas: manda la lectura visual de los recortes (ocr_worker), porque
+        # el estado de un cuadrito no esta en el texto. Se llama siempre, incluso
+        # sin lectura, para que un campo adivinado por el NLP no salga declarando
+        # 100 de confianza.
+        campos = aplicar_casillas(campos, data.get('casillas'))
 
         # Votacion de numeros: combina la extraccion NLP con 2 lecturas focalizadas
         # del VLM (data['numeric_reads']); si un valor coincide en >=2 de las 3

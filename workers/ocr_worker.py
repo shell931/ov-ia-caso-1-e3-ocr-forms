@@ -9,6 +9,8 @@ import pika
 from pathlib import Path
 from openai import OpenAI
 
+from casillas_vision import leer_casillas
+
 logging.basicConfig(
     level=logging.INFO,
     format='%(asctime)s [%(levelname)s] %(message)s'
@@ -60,6 +62,11 @@ Devuelve SOLO este JSON, sin texto extra:
 # Votación de números: 2 lecturas focalizadas extra del VLM (temperaturas
 # distintas) para reducir errores de dígito en numero_documento/telefono_movil.
 VOTE_NUMERIC = os.getenv('VOTE_NUMERIC', '1') == '1'
+
+# Lectura de casillas sobre recortes ampliados. Los 4 campos de casilla no se
+# pueden resolver desde el texto corrido: el NLP devolvía la primera opción del
+# grupo con confianza 100 aunque ninguna estuviera marcada. Ver casillas_vision.
+LEER_CASILLAS = os.getenv('LEER_CASILLAS', '1') == '1'
 
 
 def _leer_numeros_focalizado(img_base64, temp):
@@ -140,6 +147,14 @@ def procesar_ocr_vlm(ruta_imagen):
                 _leer_numeros_focalizado(img_base64, 0.3),
                 _leer_numeros_focalizado(img_base64, 0.7),
             ]
+
+        # Casillas: una pasada por cada banda recortada, con la imagen original
+        # (no el base64 de la pagina completa) para poder recortar y ampliar.
+        if LEER_CASILLAS:
+            try:
+                salida['casillas'] = leer_casillas(ruta_imagen, client_vl, VL_MODEL)
+            except Exception as e:
+                logger.warning(f"lectura de casillas fallo: {e}")
 
         return salida
         
