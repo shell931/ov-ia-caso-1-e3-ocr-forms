@@ -2,6 +2,7 @@
 """NLP Worker - Extrae campos estructurados del OCR usando LLM."""
 
 import os
+import re
 import json
 import time
 import logging
@@ -50,6 +51,10 @@ CAMPOS A EXTRAER:
 - telefono_movil: 10 dígitos
 - telefono_fijo: 7 dígitos
 - email: Formato válido
+- nivel_estudio: BACHILLERATO, TECNICO, PROFESIONAL, etc.
+- lee_braille: SI o NO
+- tipo_discapacidad: NINGUNA, VISUAL, AUDITIVA, FISICA, etc.
+- etnia: INDIGENA, AFROCOLOMBIANA, RAIZALES, o vacío si no aplica
 - votara: SI, NO, EN_BLANCO
 
 FORMATO DE SALIDA (JSON):
@@ -89,7 +94,9 @@ def procesar_nlp(data):
             'error': 'Sin texto OCR'
         }
     
-    prompt = PROMPT_TEMPLATE.format(texto_ocr=texto_ocr)
+    # El template incluye un ejemplo JSON con llaves literales, por lo que no se
+    # puede usar str.format (interpretaría {"campos": ...} como campos de formato).
+    prompt = PROMPT_TEMPLATE.replace('{texto_ocr}', texto_ocr)
     
     try:
         start = time.time()
@@ -119,7 +126,44 @@ def procesar_nlp(data):
         
         # ✨ MEJORA: Aplicar post-procesamiento
         campos = postprocesar_campos_express(campos)
-        
+
+        # Votacion de numeros: combina la extraccion NLP con 2 lecturas focalizadas
+        # del VLM (data['numeric_reads']); si un valor coincide en >=2 de las 3
+        # lecturas, se usa ese (reduce errores de digito en cedula/celular).
+        reads = data.get('numeric_reads') or []
+        if reads:
+            from collections import Counter
+            for field in ('numero_documento', 'telefono_movil'):
+                campo = next((c for c in campos if c.get('etiqueta') == field), None)
+                actual = re.sub(r'\D', '', str(campo.get('valor', '')) if campo else '')
+                votos = [actual] + [re.sub(r'\D', '', str(rd.get(field, ''))) for rd in reads]
+                votos = [v for v in votos if v]
+                if not votos:
+                    continue
+                val, cnt = Counter(votos).most_common(1)[0]
+                if cnt >= 2 and val != actual:
+                    if campo is None:
+                        campos.append({'etiqueta': field, 'valor': val,
+                                       'confianza': 85, 'voted': True})
+                    else:
+                        campo['valor'] = val
+                        campo['voted'] = True
+
+        # Backfill de formulario_no desde el doc_id (intake): los formularios se
+        # nombran por su numero (6000000001.tif -> formulario_no 6000000001), y el
+        # VLM lo omite en ~60% de los casos. Solo se rellena si viene vacio.
+        if os.getenv('BACKFILL_FORMULARIO', '1') == '1':
+            doc_num = re.sub(r'\D', '', str(doc_id))
+            if doc_num:
+                fcampo = next((c for c in campos if c.get('etiqueta') == 'formulario_no'), None)
+                if fcampo is None:
+                    campos.append({'etiqueta': 'formulario_no', 'valor': doc_num,
+                                   'confianza': 90, 'backfilled': True})
+                elif not str(fcampo.get('valor') or '').strip():
+                    fcampo['valor'] = doc_num
+                    fcampo['confianza'] = 90
+                    fcampo['backfilled'] = True
+
         logger.info(f"[{doc_id}] NLP OK - {len(campos)} campos - {elapsed:.2f}s")
         
         return {
