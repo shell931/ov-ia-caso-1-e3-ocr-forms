@@ -11,6 +11,7 @@ from openai import OpenAI
 
 from casillas_vision import leer_casillas
 from direccion_vision import leer_direccion
+from contacto_vision import leer_contacto
 
 logging.basicConfig(
     level=logging.INFO,
@@ -72,6 +73,13 @@ LEER_CASILLAS = os.getenv('LEER_CASILLAS', '1') == '1'
 # Lectura focalizada de DIRECCION (recorte ampliado). Baja errores "casi"
 # que impiden llegar a 80% de confianza oficial. Ver direccion_vision.
 LEER_DIRECCION = os.getenv('LEER_DIRECCION', '1') == '1'
+
+# Lectura focalizada de CORREO / TELEFONOS (recorte ampliado). Ver contacto_vision.
+# OFF por defecto: sim offline vs gold Parte 8 mostro que Qwen2.5-VL-7B en el
+# recorte NO mejora email/tel (oracle +0.5pp, apply agresivo/conservador empeora).
+# Muchos telefono_movil del gold estan marcados INCOMPLETO a proposito.
+# Activar con LEER_CONTACTO=1 si se sube de modelo VL.
+LEER_CONTACTO = os.getenv('LEER_CONTACTO', '0') == '1'
 
 
 def _leer_numeros_focalizado(img_base64, temp):
@@ -166,6 +174,12 @@ def procesar_ocr_vlm(ruta_imagen):
                 salida['direccion_vision'] = leer_direccion(ruta_imagen, client_vl, VL_MODEL)
             except Exception as e:
                 logger.warning(f"lectura de direccion fallo: {e}")
+
+        if LEER_CONTACTO:
+            try:
+                salida['contacto_vision'] = leer_contacto(ruta_imagen, client_vl, VL_MODEL)
+            except Exception as e:
+                logger.warning(f"lectura de contacto fallo: {e}")
 
         return salida
         
