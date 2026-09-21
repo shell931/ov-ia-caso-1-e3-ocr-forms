@@ -13,6 +13,7 @@ from openai import OpenAI
 from postprocess_express import postprocesar_campos_express
 from casillas_vision import aplicar as aplicar_casillas
 from direccion_vision import aplicar_direccion
+from contacto_vision import aplicar_contacto
 
 logging.basicConfig(
     level=logging.INFO,
@@ -141,6 +142,8 @@ def procesar_nlp(data):
         # Votacion de numeros: combina la extraccion NLP con 2 lecturas focalizadas
         # del VLM (data['numeric_reads']); si un valor coincide en >=2 de las 3
         # lecturas, se usa ese (reduce errores de digito en cedula/celular).
+        # telefono_movil se vota aqui y DESPUES puede ser corregido por el recorte
+        # de contacto (que no inventa padding a 10 digitos).
         reads = data.get('numeric_reads') or []
         if reads:
             from collections import Counter
@@ -159,6 +162,10 @@ def procesar_nlp(data):
                     else:
                         campo['valor'] = val
                         campo['voted'] = True
+
+        # Contacto focalizado (email / telefonos): despues del vote numerico para
+        # poder anular padding inventado y corregir letras del correo.
+        campos = aplicar_contacto(campos, data.get('contacto_vision'))
 
         # Backfill de formulario_no desde el doc_id (intake): los formularios se
         # nombran por su numero (6000000001.tif -> formulario_no 6000000001), y el
