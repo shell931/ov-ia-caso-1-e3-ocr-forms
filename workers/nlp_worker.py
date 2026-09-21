@@ -12,6 +12,7 @@ from openai import OpenAI
 # MEJORA: Importar post-procesamiento
 from postprocess_express import postprocesar_campos_express
 from casillas_vision import aplicar as aplicar_casillas
+from direccion_vision import aplicar_direccion
 
 logging.basicConfig(
     level=logging.INFO,
@@ -133,6 +134,9 @@ def procesar_nlp(data):
         # sin lectura, para que un campo adivinado por el NLP no salga declarando
         # 100 de confianza.
         campos = aplicar_casillas(campos, data.get('casillas'))
+
+        # Direccion focalizada: sobrescribe si el recorte visual trajo un valor.
+        campos = aplicar_direccion(campos, data.get('direccion_vision'))
 
         # Votacion de numeros: combina la extraccion NLP con 2 lecturas focalizadas
         # del VLM (data['numeric_reads']); si un valor coincide en >=2 de las 3

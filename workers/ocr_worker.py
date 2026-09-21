@@ -10,6 +10,7 @@ from pathlib import Path
 from openai import OpenAI
 
 from casillas_vision import leer_casillas
+from direccion_vision import leer_direccion
 
 logging.basicConfig(
     level=logging.INFO,
@@ -67,6 +68,10 @@ VOTE_NUMERIC = os.getenv('VOTE_NUMERIC', '1') == '1'
 # pueden resolver desde el texto corrido: el NLP devolvía la primera opción del
 # grupo con confianza 100 aunque ninguna estuviera marcada. Ver casillas_vision.
 LEER_CASILLAS = os.getenv('LEER_CASILLAS', '1') == '1'
+
+# Lectura focalizada de DIRECCION (recorte ampliado). Baja errores "casi"
+# que impiden llegar a 80% de confianza oficial. Ver direccion_vision.
+LEER_DIRECCION = os.getenv('LEER_DIRECCION', '1') == '1'
 
 
 def _leer_numeros_focalizado(img_base64, temp):
@@ -155,6 +160,12 @@ def procesar_ocr_vlm(ruta_imagen):
                 salida['casillas'] = leer_casillas(ruta_imagen, client_vl, VL_MODEL)
             except Exception as e:
                 logger.warning(f"lectura de casillas fallo: {e}")
+
+        if LEER_DIRECCION:
+            try:
+                salida['direccion_vision'] = leer_direccion(ruta_imagen, client_vl, VL_MODEL)
+            except Exception as e:
+                logger.warning(f"lectura de direccion fallo: {e}")
 
         return salida
         
