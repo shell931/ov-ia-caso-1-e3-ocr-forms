@@ -17,14 +17,13 @@ amplia, y pregunta por CADA cuadrito por separado. El valor del grupo se deriva
 despues de forma determinista, y "ningun cuadrito marcado" es un resultado
 valido y frecuente en vez de una invitacion a adivinar.
 
-Por que regiones separadas en el pie
-------------------------------------
-Leer LEE BRAILLE + DISCAPACIDAD + ETNIA en un solo recorte hacia que el VLM
-inventara marcas (p.ej. formulario 6000000020, ambos cuadritos de lee_braille
-vacios, pero respondia lee_braille.SI=✓ y tipo_discapacidad.VISUAL=✓). Separar
-los tres grupos en recortes propios y pedir el bloque con plantilla [ ] corta
-esa invencion. Ademas "SI" ya no cuenta como marca generica: si no, una
-respuesta lee_braille.SI=SI se interpretaba como cuadrito marcado.
+Por que LEE BRAILLE va aparte
+-----------------------------
+Leer braille+discapacidad+etnia en un solo recorte hacia que el VLM inventara
+marcas (p.ej. 6000000020: cuadritos vacios pero respondia lee_braille.SI=✓).
+Braille tiene su recorte; discapacidad+etnia siguen juntos (separarlos
+derrumbo tipo_discapacidad). Ademas "SI" ya no es marca generica: el eco
+lee_braille.SI=[SI] si cuenta como marcado.
 """
 import base64
 import io
@@ -34,13 +33,13 @@ import unicodedata
 
 from PIL import Image
 
-# Regiones en fracciones de (ancho, alto). El pie se parte en 3 para que el VLM
-# no "complete" un grupo mirando ruido de los vecinos.
+# Regiones en fracciones de (ancho, alto). LEE BRAILLE va aparte: en el pie
+# completo el VLM inventaba SI/VISUAL sobre cuadritos vacios (caso 6000000020).
+# Discapacidad+etnia siguen juntos (separarlos derrumbo tipo_discapacidad).
 REGIONES = {
     "nivel_estudio": (0.02, 0.55, 0.82, 0.62),
     "lee_braille": (0.015, 0.735, 0.22, 0.815),
-    "tipo_discapacidad": (0.195, 0.735, 0.58, 0.855),
-    "etnia": (0.55, 0.735, 0.90, 0.855),
+    "pie_resto": (0.195, 0.70, 0.90, 0.87),
 }
 
 # Escala 3 en el pie: las marcas reales de SI (minoritarias) se ven mejor; en
@@ -64,14 +63,23 @@ CAMPOS = tuple(OPCIONES)
 CAMPOS_REGION = {
     "nivel_estudio": ("nivel_estudio",),
     "lee_braille": ("lee_braille",),
-    "tipo_discapacidad": ("tipo_discapacidad",),
-    "etnia": ("etnia",),
+    "pie_resto": ("tipo_discapacidad", "etnia"),
 }
 
 _REGLAS_CORTAS = """
 - [X] solo si hay una marca real dentro del cuadrito. En blanco es [ ].
 - Como máximo un [X] por grupo. Si ninguno tiene marca, deja todos en [ ].
 Responde SOLO el bloque pedido."""
+
+_REGLAS_LARGAS = """
+REGLAS (obligatorias):
+- [X] solo si ves una marca real DENTRO del cuadrito (X, ✓, raya o relleno).
+- Un cuadrito en blanco es [ ]. La mayoría están en blanco.
+- Asocia cada cuadrito con la etiqueta que lo acompaña, no con la de al lado.
+- Es normal que un grupo quede todo en [ ]. NO adivines para completarlo.
+- NO marques la primera opción ni la más común por descarte.
+- Como máximo un [X] por grupo.
+Responde SOLO el bloque, sin explicaciones."""
 
 _REGLAS_VACIO_FRECUENTE = """
 REGLAS (obligatorias):
@@ -106,36 +114,40 @@ lee_braille.SI=[ ]
 lee_braille.NO=[ ]
 """,
 
-    "tipo_discapacidad": """Esta imagen es SOLO el grupo TIPO DE DISCAPACIDAD (8 cuadritos).
+    "pie_resto": """Esta imagen es la banda inferior de un formulario E3 (sin LEE BRAILLE),
+con dos grupos de casillas de izquierda a derecha:
+
+1. TIPO DE DISCAPACIDAD: NINGUNA, VISUAL (columna izquierda); FÍSICA, AUDITIVA,
+   MÚLTIPLE (columna del medio); INTELECTUAL, PSICOSOCIAL, SORDOCEGUERA (columna derecha).
+2. ETNIA: INDÍGENA, AFROCOLOMBIANA, ROM (GITANA) (columna izquierda);
+   COM.NEGRAS, RAIZALES, PALENQUEROS (columna derecha).
+
+Reporta el estado del cuadrito de cada opción:
 
 CASILLAS:
-tipo_discapacidad.NINGUNA=[ ]
-tipo_discapacidad.FISICA=[ ]
-tipo_discapacidad.INTELECTUAL=[ ]
-tipo_discapacidad.VISUAL=[ ]
-tipo_discapacidad.AUDITIVA=[ ]
-tipo_discapacidad.PSICOSOCIAL=[ ]
-tipo_discapacidad.MULTIPLE=[ ]
-tipo_discapacidad.SORDOCEGUERA=[ ]
-""",
-
-    "etnia": """Esta imagen es SOLO el grupo ETNIA (6 cuadritos).
-
-CASILLAS:
-etnia.INDIGENA=[ ]
-etnia.AFROCOLOMBIANA=[ ]
-etnia.ROM=[ ]
-etnia.COM_NEGRAS=[ ]
-etnia.RAIZALES=[ ]
-etnia.PALENQUEROS=[ ]
+tipo_discapacidad.NINGUNA=
+tipo_discapacidad.FISICA=
+tipo_discapacidad.INTELECTUAL=
+tipo_discapacidad.VISUAL=
+tipo_discapacidad.AUDITIVA=
+tipo_discapacidad.PSICOSOCIAL=
+tipo_discapacidad.MULTIPLE=
+tipo_discapacidad.SORDOCEGUERA=
+etnia.INDIGENA=
+etnia.AFROCOLOMBIANA=
+etnia.ROM=
+etnia.COM_NEGRAS=
+etnia.RAIZALES=
+etnia.PALENQUEROS=
 """,
 }
 
+# pie_resto usa las reglas largas originales (ya medidas); lee_braille las de
+# vacio frecuente porque ahi el VLM inventaba SI sobre blanco.
 _REGLAS_POR_REGION = {
     "nivel_estudio": _REGLAS_CORTAS,
     "lee_braille": _REGLAS_VACIO_FRECUENTE,
-    "tipo_discapacidad": _REGLAS_VACIO_FRECUENTE,
-    "etnia": _REGLAS_VACIO_FRECUENTE,
+    "pie_resto": _REGLAS_LARGAS,
 }
 
 PROMPTS = {r: _CUERPOS[r] + _REGLAS_POR_REGION[r] for r in _CUERPOS}
@@ -206,7 +218,8 @@ def recortar(ruta_imagen: str) -> dict:
         for region, (x0, y0, x1, y1) in REGIONES.items():
             caja = (int(x0 * W), int(y0 * H), int(x1 * W), int(y1 * H))
             rec = im.crop(caja)
-            escala = ESCALA_PIE if region != "nivel_estudio" else ESCALA
+            # Escala 3 solo en lee_braille (marcas SI finas); el resto como se midio.
+            escala = ESCALA_PIE if region == "lee_braille" else ESCALA
             if escala != 1:
                 rec = rec.resize((rec.width * escala, rec.height * escala),
                                  Image.LANCZOS)
