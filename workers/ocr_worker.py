@@ -75,7 +75,11 @@ LEER_CASILLAS = os.getenv('LEER_CASILLAS', '1') == '1'
 LEER_DIRECCION = os.getenv('LEER_DIRECCION', '1') == '1'
 
 # Lectura focalizada de CORREO / TELEFONOS (recorte ampliado). Ver contacto_vision.
-LEER_CONTACTO = os.getenv('LEER_CONTACTO', '1') == '1'
+# OFF por defecto: sim offline vs gold Parte 8 mostro que Qwen2.5-VL-7B en el
+# recorte NO mejora email/tel (oracle +0.5pp, apply agresivo/conservador empeora).
+# Muchos telefono_movil del gold estan marcados INCOMPLETO a proposito.
+# Activar con LEER_CONTACTO=1 si se sube de modelo VL.
+LEER_CONTACTO = os.getenv('LEER_CONTACTO', '0') == '1'
 
 
 def _leer_numeros_focalizado(img_base64, temp):

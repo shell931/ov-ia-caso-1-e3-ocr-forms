@@ -27,10 +27,10 @@ from PIL import Image
 # fila CORREO + MOVIL justo debajo de NIVEL DE ESTUDIO; FIJO al lado de DIRECCION.
 REGIONES = {
     "email": (
-        float(os.getenv("EMAIL_X0", "0.02")),
-        float(os.getenv("EMAIL_Y0", "0.605")),
-        float(os.getenv("EMAIL_X1", "0.70")),
-        float(os.getenv("EMAIL_Y1", "0.665")),
+        float(os.getenv("EMAIL_X0", "0.01")),
+        float(os.getenv("EMAIL_Y0", "0.595")),
+        float(os.getenv("EMAIL_X1", "0.72")),
+        float(os.getenv("EMAIL_Y1", "0.675")),
     ),
     "telefono_movil": (
         float(os.getenv("MOVIL_X0", "0.70")),
