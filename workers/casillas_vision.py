@@ -3,12 +3,14 @@
 
 Por que una pasada aparte
 -------------------------
-Los 4 campos de casilla (nivel_estudio, lee_braille, tipo_discapacidad, etnia)
-fallaban por dos motivos distintos:
+Los campos de casilla (tipo_documento, nivel_estudio, lee_braille,
+tipo_discapacidad, etnia) fallaban por dos motivos distintos:
 
 1. Invencion: el NLP solo ve texto y, al pedirsele "que opcion del grupo",
    devolvia la primera con confianza 100 aunque ningun cuadrito estuviera
-   marcado (etnia inventada en 14 de 100 documentos).
+   marcado (etnia inventada en 14 de 100; tipo_documento=CC en 6000000002
+   con ambos cuadritos en blanco — y el gold tambien inventaba CC, asi que
+   la eval oficial daba exacto/100).
 2. Desalineacion: sobre la pagina completa el VLM corre la marca a la casilla
    vecina (TECNICO leido como PROFESIONAL en 12 de 100).
 
@@ -37,6 +39,8 @@ from PIL import Image
 # completo el VLM inventaba SI/VISUAL sobre cuadritos vacios (caso 6000000020).
 # Discapacidad+etnia siguen juntos (separarlos derrumbo tipo_discapacidad).
 REGIONES = {
+    # TIPO DE DOCUMENTO (CC / CE) arriba a la derecha de FECHA INSCRIPCION.
+    "tipo_documento": (0.42, 0.18, 0.72, 0.33),
     "nivel_estudio": (0.02, 0.55, 0.82, 0.62),
     "lee_braille": (0.015, 0.735, 0.22, 0.815),
     "pie_resto": (0.195, 0.70, 0.90, 0.87),
@@ -48,6 +52,8 @@ ESCALA = int(os.getenv("CASILLAS_ESCALA", "2"))
 ESCALA_PIE = int(os.getenv("CASILLAS_ESCALA_PIE", "3"))
 
 OPCIONES = {
+    # Valores en formato gold (postprocess mapeaba CC->CEDULA_CIUDADANIA).
+    "tipo_documento": ("CEDULA_CIUDADANIA", "CEDULA_EXTRANJERIA"),
     "nivel_estudio": ("NINGUNO", "PRIMARIA", "BACHILLERATO", "TECNICO", "PROFESIONAL"),
     "lee_braille": ("SI", "NO"),
     "tipo_discapacidad": (
@@ -61,6 +67,7 @@ OPCIONES = {
 CAMPOS = tuple(OPCIONES)
 
 CAMPOS_REGION = {
+    "tipo_documento": ("tipo_documento",),
     "nivel_estudio": ("nivel_estudio",),
     "lee_braille": ("lee_braille",),
     "pie_resto": ("tipo_discapacidad", "etnia"),
@@ -91,6 +98,14 @@ REGLAS (obligatorias):
 Responde SOLO el bloque CASILLAS, sin explicaciones."""
 
 _CUERPOS = {
+    "tipo_documento": """Esta imagen es SOLO el grupo TIPO DE DOCUMENTO de un formulario E3
+(dos cuadritos verticales: CÉDULA DE CIUDADANÍA arriba, CÉDULA DE EXTRANJERÍA abajo).
+
+CASILLAS:
+tipo_documento.CEDULA_CIUDADANIA=[ ]
+tipo_documento.CEDULA_EXTRANJERIA=[ ]
+""",
+
     "nivel_estudio": """Esta imagen es la fila NIVEL DE ESTUDIO de un formulario E3 colombiano.
 
 Hay 5 cuadritos en una sola fila. De izquierda a derecha, cada etiqueta va
@@ -142,9 +157,11 @@ etnia.PALENQUEROS=
 """,
 }
 
-# pie_resto usa las reglas largas originales (ya medidas); lee_braille las de
-# vacio frecuente porque ahi el VLM inventaba SI sobre blanco.
+# pie_resto usa las reglas largas originales (ya medidas); lee_braille y
+# tipo_documento las de vacio frecuente: ahi el VLM inventaba la primera opcion
+# (SI / CEDULA_CIUDADANIA) sobre cuadritos en blanco.
 _REGLAS_POR_REGION = {
+    "tipo_documento": _REGLAS_VACIO_FRECUENTE,
     "nivel_estudio": _REGLAS_CORTAS,
     "lee_braille": _REGLAS_VACIO_FRECUENTE,
     "pie_resto": _REGLAS_LARGAS,
@@ -160,6 +177,10 @@ SINONIMOS = {
     "RAIZAL": "RAIZALES", "PALENQUERO": "PALENQUEROS",
     "SORDO CEGUERA": "SORDOCEGUERA", "MULTIPLES": "MULTIPLE",
     "TECNICA": "TECNICO", "BACHILLER": "BACHILLERATO",
+    "CC": "CEDULA_CIUDADANIA", "CEDULA DE CIUDADANIA": "CEDULA_CIUDADANIA",
+    "CEDULA CIUDADANIA": "CEDULA_CIUDADANIA",
+    "CE": "CEDULA_EXTRANJERIA", "CEDULA DE EXTRANJERIA": "CEDULA_EXTRANJERIA",
+    "CEDULA EXTRANJERIA": "CEDULA_EXTRANJERIA",
 }
 
 # OJO: no poner "SI" ni "V" aqui. "SI" como valor de lee_braille.SI=SI lo
@@ -218,8 +239,8 @@ def recortar(ruta_imagen: str) -> dict:
         for region, (x0, y0, x1, y1) in REGIONES.items():
             caja = (int(x0 * W), int(y0 * H), int(x1 * W), int(y1 * H))
             rec = im.crop(caja)
-            # Escala 3 solo en lee_braille (marcas SI finas); el resto como se midio.
-            escala = ESCALA_PIE if region == "lee_braille" else ESCALA
+            # Escala 3 en lee_braille y tipo_documento (detectar vacio vs marca fina).
+            escala = ESCALA_PIE if region in ("lee_braille", "tipo_documento") else ESCALA
             if escala != 1:
                 rec = rec.resize((rec.width * escala, rec.height * escala),
                                  Image.LANCZOS)
@@ -285,7 +306,7 @@ def confianza(info: dict) -> int:
 
 
 def leer_casillas(ruta_imagen: str, client, modelo: str) -> dict:
-    """Lee los 4 campos de casilla con una pasada de vision por region."""
+    """Lee los campos de casilla con una pasada de vision por region."""
     resultado = {}
     recortes = recortar(ruta_imagen)
     for region, campos in CAMPOS_REGION.items():
