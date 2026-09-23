@@ -45,7 +45,6 @@ CAMPOS A EXTRAER:
 - numero_documento: Solo dígitos
 - fecha_inscripcion: YYYY-MM-DD
 - fecha_expedicion: YYYY-MM-DD
-- lugar_expedicion: Ciudad de expedición
 - primer_apellido, segundo_apellido, primer_nombre, segundo_nombre
 - genero: MASCULINO o FEMENINO
 - estado_civil: SOLTERO, CASADO, UNION_LIBRE, etc.
