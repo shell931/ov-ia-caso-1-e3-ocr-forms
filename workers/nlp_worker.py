@@ -47,8 +47,6 @@ CAMPOS A EXTRAER:
 - fecha_inscripcion: YYYY-MM-DD
 - fecha_expedicion: YYYY-MM-DD
 - primer_apellido, segundo_apellido, primer_nombre, segundo_nombre
-- genero: MASCULINO o FEMENINO
-- estado_civil: SOLTERO, CASADO, UNION_LIBRE, etc.
 - direccion: Dirección completa (Cll, Cra, # sin +)
 - ciudad: Solo la ciudad, sin departamento
 - telefono_movil: 10 dígitos
@@ -185,9 +183,9 @@ def procesar_nlp(data):
                     fcampo['confianza'] = 90
                     fcampo['backfilled'] = True
 
-        # El E3 no tiene caja "lugar de expedición". Si el modelo igual lo
-        # emite, se descarta: no entra al visor ni a la confianza declarada.
-        campos = [c for c in campos if c.get("etiqueta") != "lugar_expedicion"]
+        # El E3 no tiene estas cajas. Si el modelo igual las emite, se descartan.
+        _fuera = {"lugar_expedicion", "genero", "estado_civil"}
+        campos = [c for c in campos if c.get("etiqueta") not in _fuera]
 
         logger.info(f"[{doc_id}] NLP OK - {len(campos)} campos - {elapsed:.2f}s")
         
