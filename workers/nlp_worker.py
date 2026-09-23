@@ -181,6 +181,10 @@ def procesar_nlp(data):
                     fcampo['confianza'] = 90
                     fcampo['backfilled'] = True
 
+        # El E3 no tiene caja "lugar de expedición". Si el modelo igual lo
+        # emite, se descarta: no entra al visor ni a la confianza declarada.
+        campos = [c for c in campos if c.get("etiqueta") != "lugar_expedicion"]
+
         logger.info(f"[{doc_id}] NLP OK - {len(campos)} campos - {elapsed:.2f}s")
         
         return {
