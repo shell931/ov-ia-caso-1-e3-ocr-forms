@@ -13,6 +13,7 @@ from openai import OpenAI
 from postprocess_express import postprocesar_campos_express
 from casillas_vision import aplicar as aplicar_casillas
 from direccion_vision import aplicar_direccion
+from primer_apellido_vision import aplicar_primer_apellido
 from contacto_vision import aplicar_contacto
 
 logging.basicConfig(
@@ -137,6 +138,9 @@ def procesar_nlp(data):
 
         # Direccion focalizada: sobrescribe si el recorte visual trajo un valor.
         campos = aplicar_direccion(campos, data.get('direccion_vision'))
+
+        # Segunda lectura solo de primer_apellido. No modifica otros campos.
+        campos = aplicar_primer_apellido(campos, data.get('primer_apellido_vision'))
 
         # Votacion de numeros: combina la extraccion NLP con 2 lecturas focalizadas
         # del VLM (data['numeric_reads']); si un valor coincide en >=2 de las 3

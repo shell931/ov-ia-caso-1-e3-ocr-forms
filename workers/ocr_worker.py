@@ -12,6 +12,7 @@ from openai import OpenAI
 from casillas_vision import leer_casillas
 from direccion_vision import leer_direccion
 from contacto_vision import leer_contacto
+from primer_apellido_vision import leer_primer_apellido
 
 logging.basicConfig(
     level=logging.INFO,
@@ -80,6 +81,11 @@ LEER_DIRECCION = os.getenv('LEER_DIRECCION', '1') == '1'
 # Muchos telefono_movil del gold estan marcados INCOMPLETO a proposito.
 # Activar con LEER_CONTACTO=1 si se sube de modelo VL.
 LEER_CONTACTO = os.getenv('LEER_CONTACTO', '0') == '1'
+
+# Segunda lectura solo de PRIMER APELLIDO. OFF: sim offline 100 docs
+# (Qwen2.5-VL-7B sobre el recorte) 1 win / 16 losses, 73% -> 58% exacto.
+# Activar con LEER_APELLIDO=1 si cambia el modelo VL.
+LEER_APELLIDO = os.getenv('LEER_APELLIDO', '0') == '1'
 
 
 def _leer_numeros_focalizado(img_base64, temp):
@@ -174,6 +180,13 @@ def procesar_ocr_vlm(ruta_imagen):
                 salida['direccion_vision'] = leer_direccion(ruta_imagen, client_vl, VL_MODEL)
             except Exception as e:
                 logger.warning(f"lectura de direccion fallo: {e}")
+
+        if LEER_APELLIDO:
+            try:
+                salida['primer_apellido_vision'] = leer_primer_apellido(
+                    ruta_imagen, client_vl, VL_MODEL)
+            except Exception as e:
+                logger.warning(f"lectura de primer_apellido fallo: {e}")
 
         if LEER_CONTACTO:
             try:
