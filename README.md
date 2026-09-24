@@ -55,6 +55,7 @@ caso-1-v2-e3/
 ## 📖 Documentación
 
 - [Parte 8 — resultados, modelos y handoff](docs/parte8-resultados.md) (fuente de la corrida publicada en el visor)
+- [Backup para reinstalar en un servidor físico](backup/parte8-servidor-fisico/LEEME.md)
 - [Deploy Completo](docs/deploy-completo-aws.md)
 - [Arquitectura](docs/arquitectura-parte4.txt)
 - [Deploy Rápido](README-DEPLOY.md)

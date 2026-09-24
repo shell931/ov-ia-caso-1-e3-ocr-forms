@@ -5,9 +5,10 @@ Describe qué número es el oficial, con qué modelos se obtuvo, qué ajustes
 están prendidos, qué se midió y se dejó apagado, y cómo debe continuar
 otro agente sin deshacer campos ya revisados.
 
-El código de los workers de este estado está en la rama
-`cursor/quitar-genero-estado-civil-b8cd` (y las ramas anteriores de la
-misma pila). El visor es otro repositorio.
+El código de los workers de este estado está en `main`, carpeta `workers/`.
+La copia para reinstalar el mismo stack en otro servidor, con los scripts
+de medición que solo vivían en la máquina de AWS, está en
+`backup/parte8-servidor-fisico/`. El visor es otro repositorio.
 
 `README.md` y `docs/deploy-completo-aws.md` describen la Parte 4
 (72,6 %, ~1.700 docs/h). Esta página es la fuente de la Parte 8.
@@ -100,6 +101,8 @@ publicado.
 | telefono_movil, telefono_fijo | solo dígitos; si pasa de 10 y empieza por 3, se queda con 10 |
 | email | intenta recuperar `@`, corrige hotmail/gmail/outlook y `.can`/`.cam`/`.con` → `.com`, quita espacios, pasa a minúsculas |
 | apellidos y nombres | quita dígitos y el punto final, Title Case |
+| fecha_inscripcion, fecha_expedicion | pasa `YYYY-MM-DD` a `DD/MM/YYYY`, que es el formato del gold. Sin esto las fechas estrictas quedan en 0 |
+| tipo_documento | `CC` → `CEDULA_CIUDADANIA`, `CE` → `CEDULA_EXTRANJERIA`. Después la casilla visual pisa este valor |
 
 La confianza declarada de un campo tocado por esta regla baja 5 puntos, con
 piso 70. Esa confianza no es el KPI.
