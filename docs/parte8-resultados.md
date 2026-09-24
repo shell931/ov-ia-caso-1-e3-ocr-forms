@@ -50,6 +50,127 @@ error vale 0.
 El porcentaje de cada formulario en la lista de la izquierda es el promedio
 de las notas de sus celdas. Ejemplo publicado: `6000000097` = 88,6 %.
 
+## Todo lo que produjo este resultado
+
+Misma corrida, dos números. Las lecturas dan 1.370 celdas idénticas al gold
+de 1.800 (76,1 %). El 87,8 % publicado es el promedio de la nota de cada
+celda, no un modelo distinto. Las técnicas de abajo son las que generaron
+esas lecturas. Después está la fórmula que las convierte en 87,8 %.
+
+Runtime de esa corrida, en `ubuntu@3.17.139.133`:
+
+- Imágenes: `/data/e3/front/60000000xx.tif`, frente a ~300 dpi, cerca de 2505×2194.
+- Cola RabbitMQ. 8 workers OCR y 12 NLP. El throughput no se usó como meta.
+- GPU 0: `Qwen/Qwen2.5-VL-7B-Instruct` en vLLM, puerto 8001,
+  `--gpu-memory-utilization 0.90 --max-model-len 16384 --enforce-eager --max-num-seqs 8`.
+  Checkpoint 15,45 GiB. La reserva de arranque es la que el visor escribe como ~88 GB.
+- GPU 1: `Qwen/Qwen2.5-7B-Instruct-AWQ` en vLLM, puerto 8000,
+  `--gpu-memory-utilization 0.40 --max-model-len 8192 --max-num-seqs 32 --enforce-eager`.
+  Checkpoint 5,19 GiB. La reserva es la que el visor escribe como ~40 GB.
+- No entra en este número: Docling, YOLO, RapidOCR, DeepSeek, ni el VL de 32B
+  de la Parte 7.
+
+El código que corre es el de la rama que ya está en `main` a partir de
+`756b6c1` (quitar género y estado civil) más los commits anteriores de esa
+pila. En el servidor los `.py` viven en `~/test-ia-local/caso-1-v2-e3/workers`,
+montados dentro de `caso1v2e3e3-ocr` y `caso1v2e3e3-nlp`.
+
+### 1. Primera pasada: página completa
+
+`workers/ocr_worker.py`, temperatura 0,1, `max_tokens` 2048. El VL transcribe
+el formulario entero. El prompt le pide copiar la ortografía, no completar
+nombres, copiar el correo carácter a carácter, leer números dígito a dígito
+y escribir `VACÍO` si la caja está vacía.
+
+`workers/nlp_worker.py`, el mismo 7B cuantizado, temperatura 0,1. Convierte
+ese texto en JSON de campos. El prompt pide los 18 campos del gold más
+`votara`. No pide `lugar_expedicion`, `genero` ni `estado_civil`.
+
+### 2. Postproceso de reglas, antes de los recortes
+
+`workers/postprocess_express.py`, función `postprocesar_campos_express`.
+Corre sobre el JSON del NLP, antes de que un recorte lo pueda reemplazar.
+Si el recorte después pisa el campo, esta corrección no llega al valor
+publicado.
+
+| Campo | Regla |
+| --- | --- |
+| direccion | `C11`/`C1l` → `Cll`, `Cr1` → `Cra`, `+` seguido de dígito → `#`, `+` entre dígitos → `-`, separa letra y número pegados |
+| ciudad | quita dígitos y puntos raros, Title Case, y mapea bogota/cali/medellin/barranquilla/cartagena |
+| telefono_movil, telefono_fijo | solo dígitos; si pasa de 10 y empieza por 3, se queda con 10 |
+| email | intenta recuperar `@`, corrige hotmail/gmail/outlook y `.can`/`.cam`/`.con` → `.com`, quita espacios, pasa a minúsculas |
+| apellidos y nombres | quita dígitos y el punto final, Title Case |
+
+La confianza declarada de un campo tocado por esta regla baja 5 puntos, con
+piso 70. Esa confianza no es el KPI.
+
+### 3. Doble pasada: recorte ampliado, el mismo VL 7B
+
+Segunda llamada al VL. Se recorta la caja en fracciones del ancho y del alto,
+se amplía con LANCZOS y se pregunta solo por ese campo, temperatura 0.
+No es otro modelo.
+
+Prendidas en la corrida (`LEER_CASILLAS=1`, `LEER_DIRECCION=1`):
+
+| Campo | Archivo | Recorte (x0 y0 x1 y1) | Escala | Efecto en el valor |
+| --- | --- | --- | --- | --- |
+| tipo_documento | `casillas_vision.py` | 0,42 0,18 0,72 0,33 | 3 | pisa al NLP siempre. Cero marcas = vacío, no `CEDULA_CIUDADANIA` |
+| nivel_estudio | el mismo | 0,02 0,55 0,82 0,62 | 2 | pisa al NLP. Una marca manda; dos o más dejan vacío |
+| lee_braille | el mismo, recorte propio | 0,015 0,735 0,22 0,815 | 3 | pisa al NLP. Va aparte porque en el pie completo inventaba `SI` |
+| tipo_discapacidad | el mismo, banda `pie_resto` | 0,195 0,70 0,90 0,87 | 2 | pisa al NLP. Comparte recorte con etnia |
+| etnia | la misma banda | 0,195 0,70 0,90 0,87 | 2 | pisa al NLP |
+| direccion | `direccion_vision.py` | 0,04 0,655 0,78 0,722 | 3 | transcribe la caja tal cual (`+` pasa a `#`). Se queda esta lectura si el NLP venía vacío o si el recorte no puntúa peor. 57 de 100 salieron de aquí. Literal del campo: 17 % → 25 %. Promedio de celda: 90,3 |
+
+Regla de la casilla: una sola marca define el valor (confianza declarada 95).
+Cero marcas es vacío válido (90). Más de una marca deja el campo vacío (40).
+`tipo_documento` y `lee_braille` usan la regla de vacío frecuente.
+`nivel_estudio` usa la regla corta. Discapacidad y etnia usan la regla larga.
+Separar discapacidad de etnia en dos recortes ya se midió y empeoró
+discapacidad; siguen juntas.
+
+Medidas y dejadas apagadas. El código está, el flag por defecto es 0, y en
+esta corrida no corrieron:
+
+| Campo | Flag | Recorte | Por qué no está en el resultado |
+| --- | --- | --- | --- |
+| primer_apellido | `LEER_APELLIDO=0` | 0,02 0,438 0,49 0,505, escala 4 | 1 acierto y 16 empeoramientos. Literal del campo 73 % → 58 % |
+| email | `LEER_CONTACTO=0` | 0,01 0,595 0,72 0,675, escala 3 | el recorte con este 7B no subió el exacto |
+| telefono_movil | el mismo flag | 0,70 0,605 0,995 0,665, escala 3 | apagado. El móvil publicado sale del voto de la página completa, no de este recorte |
+| telefono_fijo | el mismo flag | 0,70 0,665 0,995 0,735, escala 3 | apagado |
+
+Sin segunda pasada, solo la página completa más NLP y postproceso:
+`segundo_apellido`, `primer_nombre`, `segundo_nombre`, `ciudad`,
+`fecha_inscripcion`, `fecha_expedicion`.
+
+### 4. Voto de números, sin recorte
+
+`VOTE_NUMERIC=1`. Además de la página completa, el VL lee otra vez solo
+`numero_documento` y `telefono_movil`, temperaturas 0,3 y 0,7. Son tres
+valores (NLP + dos lecturas). Si uno aparece al menos dos veces, ese queda.
+Por eso el celular no depende del recorte de contacto.
+
+### 5. Relleno y campos que el formulario no tiene
+
+- `formulario_no` vacío se rellena con el número del archivo
+  (`6000000001.tif` → `6000000001`). Por eso ese campo quedó en 100.
+- Si el modelo emite `lugar_expedicion`, `genero` o `estado_civil`, se tiran.
+  El E3 no tiene esas cajas. `votara` sí puede salir; el gold no lo compara.
+
+Historia medida del literal del lote, antes de cambiar el agregado a
+promedio: dirección con recorte dejó el campo en 25 % literal; decir vacío
+en `tipo_documento` cuando no hay marca movió el lote de 76,8 % a 76,2 %;
+quitar `lugar_expedicion` y volver a medir lo dejó en 76,1 % (1.370 / 1.800).
+Género y estado civil se sacaron del JSON ya medido, sin otra corrida.
+
+### 6. La cuenta que publica 87,8 %
+
+Eso no relee la imagen. `compare_gold_real.py` en el servidor puntúa cada
+celda como está más abajo. En cédula, teléfonos, fechas, formulario, tipo de
+documento, nivel de estudio, braille, discapacidad y etnia, un carácter
+distinto vale 0. En apellidos, nombres, correo, ciudad y dirección vale la
+similitud. El promedio de las 1.800 notas es 87,8 %. Dirección queda en 90,3
+y correo en 93,1 aunque su literal sea 25 % y 33 %.
+
 ## Fórmula de la comparación
 
 Script en el servidor, no en este repo:
@@ -207,11 +328,31 @@ Por documento, en `workers/ocr_worker.py` y `workers/nlp_worker.py`:
 `votara` sigue en el prompt y puede salir en el JSON. El gold no lo compara.
 No se pidió quitarlo.
 
-## Ajustes que están prendidos
+## Doble pasada y recorte
 
-Todos usan el mismo VL 7B. No hay un modelo distinto por campo: hay un
-recorte, una escala y un prompt distinto, y después una regla que decide
-si esa lectura pisa al NLP.
+La doble pasada es una segunda llamada al mismo VL 7B. La primera pasada
+lee la página completa y el NLP arma el JSON. La segunda pasada, en los
+campos de abajo, recorta la caja, la amplía y vuelve a preguntar solo por
+ese campo. Sigue siendo Qwen2.5-VL-7B-Instruct. No hay un modelo distinto
+por campo.
+
+| Campo | Doble pasada | Recorte | Qué hace con la primera lectura |
+| --- | --- | --- | --- |
+| tipo_documento | sí, prendida | banda superior derecha, escala 3 | la pisa siempre |
+| nivel_estudio | sí, prendida | fila del medio, escala 2 | la pisa siempre |
+| lee_braille | sí, prendida | recorte propio, escala 3 | la pisa siempre |
+| tipo_discapacidad | sí, prendida | comparte `pie_resto` con etnia, escala 2 | la pisa siempre |
+| etnia | sí, prendida | el mismo `pie_resto`, escala 2 | la pisa siempre |
+| direccion | sí, prendida | caja de residencia, escala 3 | la usa si el NLP venía vacío o si el recorte no sale peor |
+| numero_documento | lecturas extra, sin recorte | página completa, temperaturas 0,3 y 0,7 | voto: se queda el valor que salga al menos 2 veces de 3 |
+| telefono_movil | lecturas extra, sin recorte | página completa, las mismas dos temperaturas | el mismo voto. El recorte de contacto está apagado |
+| primer_apellido | código listo, apagada | caja izquierda, escala 4 | no corre. Medido: 1 acierto y 16 empeoramientos |
+| email | código listo, apagada | caja de correo, escala 3 | no corre. No subió el exacto |
+| telefono_fijo | código listo, apagada | caja al lado de la dirección, escala 3 | no corre, va en el mismo módulo de contacto |
+| segundo_apellido, primer_nombre, segundo_nombre, ciudad, fechas, formulario_no | no | página completa | se quedan con la primera pasada. `formulario_no` vacío se rellena con el nombre del archivo |
+
+Las fracciones de cada recorte están en la sección siguiente. Un recorte
+apagado no se ejecuta: el flag por defecto es 0.
 
 ### Dirección
 
