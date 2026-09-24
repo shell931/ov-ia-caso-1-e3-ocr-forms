@@ -207,11 +207,31 @@ Por documento, en `workers/ocr_worker.py` y `workers/nlp_worker.py`:
 `votara` sigue en el prompt y puede salir en el JSON. El gold no lo compara.
 No se pidió quitarlo.
 
-## Ajustes que están prendidos
+## Doble pasada y recorte
 
-Todos usan el mismo VL 7B. No hay un modelo distinto por campo: hay un
-recorte, una escala y un prompt distinto, y después una regla que decide
-si esa lectura pisa al NLP.
+La doble pasada es una segunda llamada al mismo VL 7B. La primera pasada
+lee la página completa y el NLP arma el JSON. La segunda pasada, en los
+campos de abajo, recorta la caja, la amplía y vuelve a preguntar solo por
+ese campo. Sigue siendo Qwen2.5-VL-7B-Instruct. No hay un modelo distinto
+por campo.
+
+| Campo | Doble pasada | Recorte | Qué hace con la primera lectura |
+| --- | --- | --- | --- |
+| tipo_documento | sí, prendida | banda superior derecha, escala 3 | la pisa siempre |
+| nivel_estudio | sí, prendida | fila del medio, escala 2 | la pisa siempre |
+| lee_braille | sí, prendida | recorte propio, escala 3 | la pisa siempre |
+| tipo_discapacidad | sí, prendida | comparte `pie_resto` con etnia, escala 2 | la pisa siempre |
+| etnia | sí, prendida | el mismo `pie_resto`, escala 2 | la pisa siempre |
+| direccion | sí, prendida | caja de residencia, escala 3 | la usa si el NLP venía vacío o si el recorte no sale peor |
+| numero_documento | lecturas extra, sin recorte | página completa, temperaturas 0,3 y 0,7 | voto: se queda el valor que salga al menos 2 veces de 3 |
+| telefono_movil | lecturas extra, sin recorte | página completa, las mismas dos temperaturas | el mismo voto. El recorte de contacto está apagado |
+| primer_apellido | código listo, apagada | caja izquierda, escala 4 | no corre. Medido: 1 acierto y 16 empeoramientos |
+| email | código listo, apagada | caja de correo, escala 3 | no corre. No subió el exacto |
+| telefono_fijo | código listo, apagada | caja al lado de la dirección, escala 3 | no corre, va en el mismo módulo de contacto |
+| segundo_apellido, primer_nombre, segundo_nombre, ciudad, fechas, formulario_no | no | página completa | se quedan con la primera pasada. `formulario_no` vacío se rellena con el nombre del archivo |
+
+Las fracciones de cada recorte están en la sección siguiente. Un recorte
+apagado no se ejecuta: el flag por defecto es 0.
 
 ### Dirección
 
