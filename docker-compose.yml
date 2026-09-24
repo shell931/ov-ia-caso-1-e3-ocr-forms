@@ -34,7 +34,6 @@ services:
   #  VLLM - GPU 1 - NLP Model (Qwen2.5-7B-Instruct-AWQ)
   # ═══════════════════════════════════════════════════════════
   vllm:
-    profiles: ["gpu"]
     image: vllm/vllm-openai:latest
     container_name: caso1v2e3e3-vllm-nlp
     runtime: nvidia
@@ -69,7 +68,6 @@ services:
   #  VLLM-VL - GPU 0 - Vision Model (Qwen2.5-VL-7B-Instruct)
   # ═══════════════════════════════════════════════════════════
   vllm-vl:
-    profiles: ["gpu"]
     image: vllm/vllm-openai:latest
     container_name: caso1v2e3e3-vllm-vl
     runtime: nvidia
@@ -87,7 +85,7 @@ services:
       - --gpu-memory-utilization
       - "0.90"
       - --max-model-len
-      - "4096"
+      - "16384"
       - --enforce-eager
       - --max-num-seqs
       - "8"

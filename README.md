@@ -54,6 +54,7 @@ caso-1-v2-e3/
 
 ## 📖 Documentación
 
+- [Parte 8 — resultados, modelos y handoff](docs/parte8-resultados.md) (fuente de la corrida publicada en el visor)
 - [Deploy Completo](docs/deploy-completo-aws.md)
 - [Arquitectura](docs/arquitectura-parte4.txt)
 - [Deploy Rápido](README-DEPLOY.md)
