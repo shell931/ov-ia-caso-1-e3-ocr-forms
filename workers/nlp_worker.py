@@ -15,6 +15,7 @@ from casillas_vision import aplicar as aplicar_casillas
 from direccion_vision import aplicar_direccion
 from primer_apellido_vision import aplicar_primer_apellido
 from contacto_vision import aplicar_contacto
+from digitos_vision import aplicar_digitos
 
 logging.basicConfig(
     level=logging.INFO,
@@ -140,12 +141,17 @@ def procesar_nlp(data):
         # Segunda lectura solo de primer_apellido. No modifica otros campos.
         campos = aplicar_primer_apellido(campos, data.get('primer_apellido_vision'))
 
-        # Votacion de numeros: combina la extraccion NLP con 2 lecturas focalizadas
-        # del VLM (data['numeric_reads']); si un valor coincide en >=2 de las 3
-        # lecturas, se usa ese (reduce errores de digito en cedula/celular).
-        # telefono_movil se vota aqui y DESPUES puede ser corregido por el recorte
-        # de contacto (que no inventa padding a 10 digitos).
-        reads = data.get('numeric_reads') or []
+        # Votacion de numeros: NLP + 2 lecturas pagina completa + recorte digitos.
+        reads = list(data.get('numeric_reads') or [])
+        dig = data.get('digitos_vision') or {}
+        extra = {}
+        for field in ('numero_documento', 'telefono_movil'):
+            v = (dig.get(field) or {}).get('valor') or ''
+            v = re.sub(r'\D', '', str(v))
+            if v:
+                extra[field] = v
+        if extra:
+            reads = reads + [extra]
         if reads:
             from collections import Counter
             for field in ('numero_documento', 'telefono_movil'):
@@ -163,6 +169,10 @@ def procesar_nlp(data):
                     else:
                         campo['valor'] = val
                         campo['voted'] = True
+
+        # Recorte de digitos: corrige cedula/telefonos cuando el formato del
+        # recorte es claramente mejor (p.ej. movil 10 digitos vs truncado).
+        campos = aplicar_digitos(campos, data.get('digitos_vision'))
 
         # Contacto focalizado (email / telefonos): despues del vote numerico para
         # poder anular padding inventado y corregir letras del correo.

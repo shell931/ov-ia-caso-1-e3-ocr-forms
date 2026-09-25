@@ -13,6 +13,7 @@ from casillas_vision import leer_casillas
 from direccion_vision import leer_direccion
 from contacto_vision import leer_contacto
 from primer_apellido_vision import leer_primer_apellido
+from digitos_vision import leer_digitos
 
 logging.basicConfig(
     level=logging.INFO,
@@ -86,6 +87,10 @@ LEER_CONTACTO = os.getenv('LEER_CONTACTO', '0') == '1'
 # (Qwen2.5-VL-7B sobre el recorte) 1 win / 16 losses, 73% -> 58% exacto.
 # Activar con LEER_APELLIDO=1 si cambia el modelo VL.
 LEER_APELLIDO = os.getenv('LEER_APELLIDO', '0') == '1'
+
+# Lectura dedicada de digitos (cedula + telefonos) sobre recortes ampliados.
+# Parte 10: mismo VL 7B (no hay VRAM libre para otro modelo). Ver digitos_vision.
+LEER_DIGITOS = os.getenv('LEER_DIGITOS', '1') == '1'
 
 
 def _leer_numeros_focalizado(img_base64, temp):
@@ -187,6 +192,12 @@ def procesar_ocr_vlm(ruta_imagen):
                     ruta_imagen, client_vl, VL_MODEL)
             except Exception as e:
                 logger.warning(f"lectura de primer_apellido fallo: {e}")
+
+        if LEER_DIGITOS:
+            try:
+                salida['digitos_vision'] = leer_digitos(ruta_imagen, client_vl, VL_MODEL)
+            except Exception as e:
+                logger.warning(f"lectura de digitos fallo: {e}")
 
         if LEER_CONTACTO:
             try:
