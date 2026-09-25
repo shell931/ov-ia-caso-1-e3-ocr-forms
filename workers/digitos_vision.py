@@ -20,11 +20,13 @@ from PIL import Image
 
 REGIONES = {
     # Fila de casillas NÚMERO DE DOCUMENTO (10 cuadritos).
+    # Calibrado 6000000004: escala 2 > 4 (x4 confunde 7/6). Caja un poco
+    # más baja/ancha que el label; no llega a FECHA DE EXPEDICIÓN.
     "numero_documento": (
-        float(os.getenv("CED_X0", "0.06")),
-        float(os.getenv("CED_Y0", "0.325")),
-        float(os.getenv("CED_X1", "0.50")),
-        float(os.getenv("CED_Y1", "0.395")),
+        float(os.getenv("CED_X0", "0.02")),
+        float(os.getenv("CED_Y0", "0.330")),
+        float(os.getenv("CED_X1", "0.55")),
+        float(os.getenv("CED_Y1", "0.410")),
     ),
     "telefono_movil": (
         float(os.getenv("MOVIL_X0", "0.70")),
@@ -40,7 +42,7 @@ REGIONES = {
     ),
 }
 
-ESCALA = int(os.getenv("DIGITOS_ESCALA", "4"))
+ESCALA = int(os.getenv("DIGITOS_ESCALA", "2"))
 CAMPOS = ("numero_documento", "telefono_movil", "telefono_fijo")
 
 _PROMPT = {
