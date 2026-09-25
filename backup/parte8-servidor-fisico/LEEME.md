@@ -54,6 +54,76 @@ físico con dos GPU de esa clase puede usar este `docker-compose.yml` tal
 cual. Con tarjetas más chicas hay que bajar `--gpu-memory-utilization` y
 `--max-model-len` antes de arrancar; si no, vLLM no carga el modelo.
 
+## Flujo Parte 8 (diagrama)
+
+Infra y pipeline **tal cual midió el 87,8 % vs gold** (968 docs/h,
+~6 min 12 s / 100). Mismos contenedores Docker y colas RabbitMQ que
+Parte 10; la diferencia es que **aquí no existe el lector de dígitos**
+(`digitos_vision` / `LEER_DIGITOS`).
+
+```mermaid
+flowchart TB
+  subgraph ingress["1. Entrada"]
+    TIF["TIFF en /data/e3/front/\nej. 6000000004.tif"]
+    ENQ["scripts/load_test_simple.py\n(pika → RabbitMQ)"]
+    TIF --> ENQ
+    ENQ -->|"JSON: doc_id + ruta_imagen"| Q1["Cola RabbitMQ\nocr_input"]
+  end
+
+  subgraph ocr["2. OCR / visión — contenedor ocr · 8 workers"]
+    OW["workers/ocr_worker.py\npika + openai"]
+    Q1 --> OW
+    OW --> VL["vLLM GPU0 :8001\nQwen2.5-VL-7B-Instruct\npágina completa"]
+    OW --> VOTE["VOTE_NUMERIC=1\n2 lecturas focalizadas\ncedula + móvil (página)"]
+    OW --> CAS["casillas_vision.py\nLEER_CASILLAS=1\nPillow + mismo VL"]
+    OW --> DIR["direccion_vision.py\nLEER_DIRECCION=1"]
+    OW -.->|"OFF"| OFF["LEER_CONTACTO=0\nLEER_APELLIDO=0\n(sin digitos_vision)"]
+    VL --> PACK["Un solo JSON por doc_id:\ntexto_ocr, numeric_reads,\ncasillas, direccion_vision"]
+    VOTE --> PACK
+    CAS --> PACK
+    DIR --> PACK
+    PACK --> Q2["Cola RabbitMQ\nocr_output"]
+  end
+
+  subgraph nlp["3. NLP / campos — contenedor nlp · 12 workers"]
+    NW["workers/nlp_worker.py\npika + openai"]
+    Q2 --> NW
+    NW --> LLM["vLLM GPU1 :8000\nQwen2.5-7B-Instruct-AWQ"]
+    LLM --> PP["postprocess_express.py\nfechas DD/MM/YYYY, CC→CEDULA…"]
+    PP --> APL["aplicar_casillas\naplicar_direccion\nvoto numérico NLP+reads"]
+    APL --> Q3["Cola RabbitMQ\nnlp_output\ncampos + doc_id"]
+  end
+
+  subgraph eval["4. Medición Parte 8"]
+    CON["scripts/consume_results.py\n→ JSONL"]
+    Q3 --> CON
+    CON --> PRED["preds con id + estado=listo"]
+    PRED --> CMP["compare_gold_real.py\nvs gold.json → conf_real 87,8 %"]
+    CMP --> VIS["build_parte8_fragment.py\n+ add_parte8.py → e3-pages"]
+  end
+```
+
+| Fase | Tecnología | Script / servicio |
+| --- | --- | --- |
+| Encolar | RabbitMQ, pika | `scripts/load_test_simple.py` |
+| Visión | vLLM + Qwen2.5-VL-7B, Pillow | `ocr_worker.py`, `casillas_vision.py`, `direccion_vision.py` |
+| Campos | vLLM + Qwen2.5-7B-AWQ | `nlp_worker.py`, `postprocess_express.py` |
+| Medir | Python | `consume_results.py`, `compare_gold_real.py` vs **gold.json** |
+| Orquestación | Docker Compose | `docker-compose.yml` (8 OCR + 12 NLP) |
+
+### Qué cambia respecto a Parte 10
+
+| | Parte 8 (este LEEME) | Parte 10 |
+| --- | --- | --- |
+| Lector de dígitos | **No** | Sí: `digitos_vision.py`, crop + escala×2 |
+| KPI oficial | 87,8 % vs **gold** | 89,6 % vs **gold_v2** |
+| docs/h (meta 1250) | **968** | 872 |
+| Gold de discapacidad NINGUNA | No (regla llega en Parte 9) | Sí (heredada) |
+| Stack Docker / modelos / colas | Igual | Igual |
+
+El paquete autocontenido de Parte 10 (con diagrama propio) está en
+`backup/parte10-servidor-fisico/`.
+
 ## 1. Copiar imágenes y gold, ahora
 
 Desde una máquina que tenga la llave SSH del servidor actual:
