@@ -46,3 +46,10 @@ python3 scripts/compare_gold_real.py /data/e3/gold/gold_v2.json \
 ```
 
 Visor: https://shell931.github.io/e3-pages/ — menú Parte 10. Hard refresh.
+
+## Backup para servidor físico
+
+Paquete autocontenido (workers + compose + scripts + KPIs + implementación):
+
+`backup/parte10-servidor-fisico/` — empezar por `LEEME.md` e `IMPLEMENTACION.md`.
+

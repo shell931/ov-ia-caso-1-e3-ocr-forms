@@ -9,8 +9,9 @@ AWS siga encendido.
 - Parte 8 (modelos, recortes, fórmula): `docs/parte8-resultados.md`
 - Parte 9 (gold_v2 teléfonos + regla NINGUNA): **`PARTE9.md`** en esta
   carpeta y `docs/parte9-resultados.md` en la raíz del repo.
-- Parte 10 (lector de dígitos cédula + celular): **`PARTE10.md`** en
-  esta carpeta y `docs/parte10-resultados.md` en la raíz del repo.
+- Parte 10 (lector de dígitos): carpeta independiente
+  **`backup/parte10-servidor-fisico/`** (LEEME + IMPLEMENTACION) y
+  `docs/parte10-resultados.md`.
 
 ## Qué hay aquí
 
