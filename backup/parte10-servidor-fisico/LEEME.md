@@ -130,6 +130,30 @@ Resumen de piezas:
 | Medir | Python stdlib | `consume_parte10.py`, `compare_gold_real.py` |
 | Orquestación | Docker Compose | `docker-compose.yml` (8 OCR + 12 NLP) |
 
+## Qué cambia entre Parte 8 y Parte 10
+
+Entre Parte 8 y Parte 10 el **stack es el mismo** (Docker, RabbitMQ,
+8 OCR + 12 NLP, VL 7B en GPU0, NLP AWQ en GPU1). Cambia el **paso de
+dígitos** y cómo se mide.
+
+| | Parte 8 | Parte 10 |
+| --- | --- | --- |
+| Lector de dígitos | No | Sí: `digitos_vision.py` (recorte + zoom ×2 → mismo VL) |
+| Flag nuevo | — | `LEER_DIGITOS=1` |
+| Voto numérico | NLP + 2 lecturas de **página** | Eso **+** recorte de dígitos (si formato OK) |
+| `aplicar_digitos` | No | Sí (móvil 10 dígitos tipo `3…`; cédula 8–10; fijo no se aplica) |
+| Casillas / dirección | ON | ON (igual) |
+| Contacto / apellido | OFF | OFF (igual) |
+| Regla NINGUNA discapacidad | No (llega en Parte 9) | Sí (heredada de Parte 9) |
+| KPI oficial | **87,8 %** vs `gold` | **89,6 %** vs `gold_v2` |
+| Misma corrida vs gold | 87,8 % | **88,4 %** |
+| Cédula exacta | 86 % | **88 %** |
+| docs/h (meta 1250) | **968** | **872** (más VL calls por doc) |
+
+En corto: Parte 10 no cambia modelos ni colas; añade un script Python que
+recorta cédula/móvil, los pasa al mismo VL y mete esa lectura en el voto
+del mismo `doc_id`. Parte 8/9 del visor no se pisan.
+
 No trae las imágenes TIFF ni el gold (datos personales). Hay que
 copiarlos aparte **mientras el servidor AWS siga encendido** (paso 1).
 

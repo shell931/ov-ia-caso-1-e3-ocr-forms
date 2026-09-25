@@ -7,7 +7,7 @@
 c4a69ce50703569f8df4eae6f956e1fa  ./IMPLEMENTACION.md
 ed8bffc09f796f1f5a2b08c794eb8672  ./kpis/parte10-gold.json
 aea286cfea9014ecb8a404fa9124dab5  ./kpis/parte10v2-gold.json
-24a0f7f5b3e9f70eaed8586dbd0f1cb9  ./LEEME.md
+57b6e382e2782799e7b4e04eec57dd0d  ./LEEME.md
 06c7469dc26aecee9e56e8dbeeb35eb2  ./scripts/add_parte10.py
 648718ae8af1826446c2fba33bc2c0ae  ./scripts/add_parte8.py
 b006b0d776ae342a5cdf5b2da589670f  ./scripts/build_parte10_fragment.py
