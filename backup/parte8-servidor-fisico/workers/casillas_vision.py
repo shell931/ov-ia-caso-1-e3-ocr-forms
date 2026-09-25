@@ -288,10 +288,24 @@ def parse_bloque(texto: str, campos: tuple) -> dict:
         for opcion, est in pares:
             estado_por_opcion[opcion] = estado_por_opcion.get(opcion, False) or est
         marcadas = [o for o, est in estado_por_opcion.items() if est]
+        valor = ""
+        if len(marcadas) == 1:
+            valor = marcadas[0]
+        elif (
+            campo == "tipo_discapacidad"
+            and len(marcadas) == 2
+            and "NINGUNA" in marcadas
+        ):
+            # En el pie del E3 a menudo queda una segunda marca fantasma junto a
+            # NINGUNA. Si se blanquea el campo, se pierden ~14 exactos. Se conserva
+            # NINGUNA. Caso conocido que sigue mal: 6000000058 (NINGUNA+VISUAL,
+            # gold VISUAL).
+            valor = "NINGUNA"
         salida[campo] = {
-            "valor": marcadas[0] if len(marcadas) == 1 else "",
+            "valor": valor,
             "evidencia": True,
             "marcadas": len(marcadas),
+            "marcadas_ops": marcadas,
         }
     return salida
 

@@ -1,22 +1,25 @@
-# Backup Parte 8 — reinstalar en un servidor físico
+# Backup Parte 8 / Parte 9 — reinstalar en un servidor físico
 
-Esta carpeta es la copia para levantar **el mismo pipeline** que produjo
-el 87,8 % de la Parte 8. No trae las imágenes ni el gold: son datos
-personales y hay que copiarlos aparte, con el script de abajo, mientras
-el servidor de AWS siga encendido.
+Esta carpeta es la copia para levantar **el mismo pipeline** que midió
+Parte 8 (87,8 %) y Parte 9 (88,9 % vs gold_v2). No trae las imágenes ni
+el gold: son datos personales y hay que copiarlos aparte, con el script
+de abajo, mientras el servidor de AWS siga encendido.
 
-El detalle de modelos, recortes y fórmula está en
-`docs/parte8-resultados.md` en la raíz del repo.
+- Parte 8 (modelos, recortes, fórmula): `docs/parte8-resultados.md`
+- Parte 9 (gold_v2 teléfonos + regla NINGUNA): **`PARTE9.md`** en esta
+  carpeta y `docs/parte9-resultados.md` en la raíz del repo.
 
 ## Qué hay aquí
 
 | Ruta | Qué es |
 | --- | --- |
-| `workers/` | Los Python que leen el formulario. Es lo que hay que montar en los contenedores OCR y NLP. |
+| `workers/` | Los Python que leen el formulario (incluye la regla NINGUNA de Parte 9 en `casillas_vision.py`). |
+| `PARTE9.md` | Qué cambió en Parte 9, números, ejemplo de discapacidad, cómo copiar `gold_v2`. |
+| `gold_v2_resumen.json` | Ids de teléfonos confirmados en gold_v2, **sin** los números (PII). |
 | `docker-compose.yml` | RabbitMQ + vLLM visión (GPU 0) + vLLM NLP (GPU 1) + 8 workers OCR + 12 workers NLP. La imagen de vLLM está fijada al digest que corrió en AWS el 24 sep 2026. |
 | `scripts/load_test_simple.py` | Mete hasta 100 TIFF `6*.tif` en la cola `ocr_input`. |
 | `scripts/consume_results.py` | Saca la cola `nlp_output` a un JSONL. |
-| `scripts/compare_gold_real.py` | La fórmula oficial: promedio de celda = 87,8 % en la corrida publicada. |
+| `scripts/compare_gold_real.py` | La fórmula oficial: promedio de celda. |
 | `scripts/build_parte8_fragment.py` | Arma el JSON del visor. Escribe datos personales en `/data/e3/`. |
 | `scripts/add_parte8.py` y `publicar_parte8.sh` | Publican el visor. No hace falta para que el OCR funcione. `publicar_parte8.sh` reescribe el menú de Parte 8 con un texto viejo; no lo corras sobre el visor actual. |
 
@@ -31,6 +34,10 @@ flag en 0 el comportamiento es el de la corrida publicada.
 `primer_apellido_vision.py` no estaba en el disco del servidor, pero
 `nlp_worker.py` lo importa. Sin ese archivo el contenedor NLP no arranca.
 El flag sigue en 0, así que no cambia las lecturas.
+
+`workers/casillas_vision.py` incluye la regla de Parte 9: si
+`tipo_discapacidad` tiene exactamente dos marcas y una es `NINGUNA`, se
+conserva `NINGUNA`. Ver `PARTE9.md`.
 
 ## Hardware que usó esta configuración
 
@@ -54,11 +61,14 @@ mkdir -p "$DEST/front" "$DEST/gold"
 rsync -av -e "ssh -i $SSH_KEY" \
   ubuntu@3.17.139.133:/data/e3/front/ "$DEST/front/"
 rsync -av -e "ssh -i $SSH_KEY" \
-  ubuntu@3.17.139.133:/data/e3/gold/gold.json "$DEST/gold/gold.json"
+  ubuntu@3.17.139.133:/data/e3/gold/gold.json \
+  ubuntu@3.17.139.133:/data/e3/gold/gold_v2.json \
+  ubuntu@3.17.139.133:/data/e3/gold/gold_v2_cambios.json \
+  "$DEST/gold/"
 ```
 
 Son 100 TIFF de frente, ids `6000000001`–`6000000101` excepto
-`6000000033`, más `gold.json`. No subas esa carpeta a git.
+`6000000033`, más `gold.json` y `gold_v2.json`. No subas esa carpeta a git.
 
 ## 2. Preparar el servidor físico
 

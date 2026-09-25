@@ -56,7 +56,7 @@ caso-1-v2-e3/
 
 - [Parte 8 — resultados, modelos y handoff](docs/parte8-resultados.md) (fuente de la corrida publicada en el visor)
 - [Parte 9 — gold_v2 teléfonos + discapacidad](docs/parte9-resultados.md)
-- [Backup para reinstalar en un servidor físico](backup/parte8-servidor-fisico/LEEME.md)
+- [Backup para reinstalar en un servidor físico](backup/parte8-servidor-fisico/LEEME.md) (incluye [PARTE9.md](backup/parte8-servidor-fisico/PARTE9.md))
 - [Deploy Completo](docs/deploy-completo-aws.md)
 - [Arquitectura](docs/arquitectura-parte4.txt)
 - [Deploy Rápido](README-DEPLOY.md)
