@@ -47,6 +47,88 @@ RapidOCR/Paddle, se reutilizó ese mismo VL 7B sobre los recortes.
 El NLP sigue en AWQ (eso ya venía de antes). El VL de visión **no** se
 cuantizó en Parte 10. Parte 8 y Parte 9 del visor no se tocaron.
 
+### Cómo se relaciona el recorte con el formulario (sin mezclar)
+
+No hay cola aparte de recortes ni hash de imagen. Todo va **en el mismo
+mensaje** del formulario:
+
+1. A `ocr_input` entra, por ejemplo,
+   `{ "doc_id": "6000000004", "ruta_imagen": "/data/e3/front/6000000004.tif" }`.
+2. Un worker OCR toma **ese** mensaje, abre **esa** ruta y, en el mismo
+   proceso Python, hace página completa + casillas + recortes de dígitos
+   sobre ese TIFF (`digitos_vision.py` vía Pillow).
+3. El resultado de dígitos **no viaja suelto**: se mete en el mismo JSON
+   como campo `digitos_vision`, junto con el `doc_id`, y eso se publica
+   a `ocr_output`.
+4. El NLP lee ese mensaje, aplica voto / `aplicar_digitos` a **esos**
+   campos y publica a `nlp_output` otra vez con el mismo `doc_id`.
+
+Otro formulario = otro mensaje, otra ruta, otro `digitos_vision`. No hay
+recortes huérfanos en la cola.
+
+Quién hace el recorte+zoom: el script Python `workers/digitos_vision.py`,
+llamado desde `workers/ocr_worker.py` cuando `LEER_DIGITOS=1` (dentro del
+contenedor OCR, 8 procesos).
+
+## Flujo completo (diagrama)
+
+Tecnologías por fase: **Docker Compose**, **RabbitMQ** (colas),
+**vLLM** (API OpenAI-compatible), **Pillow** (recorte/escala),
+**pika** (clientes de cola), scripts en `workers/` y `scripts/`.
+
+```mermaid
+flowchart TB
+  subgraph ingress["1. Entrada"]
+    TIF["TIFF en /data/e3/front/\nej. 6000000004.tif"]
+    ENQ["scripts/enqueue_parte10.py\no load_test_simple.py"]
+    TIF --> ENQ
+    ENQ -->|"JSON: doc_id + ruta_imagen"| Q1["Cola RabbitMQ\nocr_input"]
+  end
+
+  subgraph ocr["2. OCR / visión — contenedor ocr · 8 workers"]
+    OW["workers/ocr_worker.py\npika + openai"]
+    Q1 --> OW
+    OW --> VL["vLLM GPU0 :8001\nQwen2.5-VL-7B-Instruct\npágina completa + voto numérico"]
+    OW --> CAS["casillas_vision.py\nLEER_CASILLAS=1"]
+    OW --> DIR["direccion_vision.py\nLEER_DIRECCION=1"]
+    OW --> DIG["digitos_vision.py\nPillow: crop + escala×2\nLEER_DIGITOS=1 → mismo VL"]
+    VL --> PACK["Un solo JSON por doc_id:\ntexto_ocr, numeric_reads,\ncasillas, direccion_vision,\ndigitos_vision"]
+    CAS --> PACK
+    DIR --> PACK
+    DIG --> PACK
+    PACK --> Q2["Cola RabbitMQ\nocr_output"]
+  end
+
+  subgraph nlp["3. NLP / campos — contenedor nlp · 12 workers"]
+    NW["workers/nlp_worker.py\npika + openai"]
+    Q2 --> NW
+    NW --> LLM["vLLM GPU1 :8000\nQwen2.5-7B-Instruct-AWQ\nextrae campos del texto"]
+    LLM --> PP["postprocess_express.py"]
+    PP --> VOTO["Voto numérico:\nNLP + numeric_reads +\ndigitos si formato OK"]
+    VOTO --> APL["aplicar_digitos\naplicar_casillas / dirección"]
+    APL --> Q3["Cola RabbitMQ\nnlp_output\ncampos + doc_id"]
+  end
+
+  subgraph eval["4. Medición y publicación"]
+    CON["scripts/consume_parte10.py\n→ resultados_parte10.jsonl"]
+    Q3 --> CON
+    CON --> PRED["preds_parte10.json\nid + estado=listo"]
+    PRED --> CMP1["compare_gold_real.py\nvs gold.json → parte10"]
+    PRED --> CMP2["compare_gold_real.py\nvs gold_v2.json → parte10v2 KPI"]
+    CMP2 --> VIS["Opcional: build_parte10_fragment.py\n+ add_parte10.py → e3-pages"]
+  end
+```
+
+Resumen de piezas:
+
+| Fase | Tecnología | Script / servicio |
+| --- | --- | --- |
+| Encolar | RabbitMQ, pika | `scripts/enqueue_parte10.py` |
+| Visión | vLLM + Qwen2.5-VL-7B, Pillow | `ocr_worker.py`, `digitos_vision.py`, `casillas_vision.py`, `direccion_vision.py` |
+| Campos | vLLM + Qwen2.5-7B-AWQ | `nlp_worker.py`, `postprocess_express.py` |
+| Medir | Python stdlib | `consume_parte10.py`, `compare_gold_real.py` |
+| Orquestación | Docker Compose | `docker-compose.yml` (8 OCR + 12 NLP) |
+
 No trae las imágenes TIFF ni el gold (datos personales). Hay que
 copiarlos aparte **mientras el servidor AWS siga encendido** (paso 1).
 
