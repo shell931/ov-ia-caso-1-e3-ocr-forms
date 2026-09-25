@@ -57,7 +57,6 @@ CAMPOS A EXTRAER:
 - lee_braille: SI o NO
 - tipo_discapacidad: NINGUNA, VISUAL, AUDITIVA, FISICA, etc.
 - etnia: INDIGENA, AFROCOLOMBIANA, RAIZALES, o vacío si no aplica
-- votara: SI, NO, EN_BLANCO
 
 FORMATO DE SALIDA (JSON):
 ```json

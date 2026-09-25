@@ -1,6 +1,7 @@
 # Manifest Parte 10 — checksums (md5)
 # Paquete para desplegar tal cual la corrida publicada (25 sep 2026).
 # KPI: 89.6% vs gold_v2 · 88.4% vs gold · cedula 88% · 872 docs/h.
+# post: votara descartado del NLP (no existe en E3).
 
 8d6963c0c11929154dc0525a8321ecb2  ./docker-compose.yml
 735bb748b357c985281cbfdded57516a  ./gold_v2_resumen.json
@@ -25,7 +26,7 @@ c7b67ce7284307a8a9968eec151f2d0a  ./workers/casillas_vision.py
 cb5fa7b371c878a083f832fd487225f7  ./workers/contacto_vision.py
 d2202dc7e84f8fdb1e36366b4d7ed477  ./workers/digitos_vision.py
 96eb2ed5db37ac45312a7897ca1afb7e  ./workers/direccion_vision.py
-412a7462acb7e2e8c75a17dbf81eff74  ./workers/nlp_worker.py
+6f0e037a9dcb0e94db2da9f7a8d398ae  ./workers/nlp_worker.py
 5fb919d87532e15a0606e65094ba69ae  ./workers/ocr_worker.py
 9cf90911a321c69d0b9377450a049152  ./workers/postprocess_express.py
 00d845d7d6d085cc3fe98ca401b4127b  ./workers/primer_apellido_vision.py

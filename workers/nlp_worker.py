@@ -57,7 +57,6 @@ CAMPOS A EXTRAER:
 - lee_braille: SI o NO
 - tipo_discapacidad: NINGUNA, VISUAL, AUDITIVA, FISICA, etc.
 - etnia: INDIGENA, AFROCOLOMBIANA, RAIZALES, o vacío si no aplica
-- votara: SI, NO, EN_BLANCO
 
 FORMATO DE SALIDA (JSON):
 ```json
@@ -199,7 +198,7 @@ def procesar_nlp(data):
                     fcampo['backfilled'] = True
 
         # El E3 no tiene estas cajas. Si el modelo igual las emite, se descartan.
-        _fuera = {"lugar_expedicion", "genero", "estado_civil"}
+        _fuera = {"lugar_expedicion", "genero", "estado_civil", "votara"}
         campos = [c for c in campos if c.get("etiqueta") not in _fuera]
 
         logger.info(f"[{doc_id}] NLP OK - {len(campos)} campos - {elapsed:.2f}s")
