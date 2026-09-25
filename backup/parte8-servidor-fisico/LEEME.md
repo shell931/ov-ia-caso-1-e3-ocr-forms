@@ -1,13 +1,16 @@
-# Backup Parte 8 / Parte 9 — reinstalar en un servidor físico
+# Backup Parte 8 / Parte 9 / Parte 10 — reinstalar en un servidor físico
 
 Esta carpeta es la copia para levantar **el mismo pipeline** que midió
-Parte 8 (87,8 %) y Parte 9 (88,9 % vs gold_v2). No trae las imágenes ni
-el gold: son datos personales y hay que copiarlos aparte, con el script
-de abajo, mientras el servidor de AWS siga encendido.
+Parte 8 (87,8 %), Parte 9 (88,9 % vs gold_v2) y Parte 10 (89,6 % vs
+gold_v2). No trae las imágenes ni el gold: son datos personales y hay
+que copiarlos aparte, con el script de abajo, mientras el servidor de
+AWS siga encendido.
 
 - Parte 8 (modelos, recortes, fórmula): `docs/parte8-resultados.md`
 - Parte 9 (gold_v2 teléfonos + regla NINGUNA): **`PARTE9.md`** en esta
   carpeta y `docs/parte9-resultados.md` en la raíz del repo.
+- Parte 10 (lector de dígitos cédula + celular): **`PARTE10.md`** en
+  esta carpeta y `docs/parte10-resultados.md` en la raíz del repo.
 
 ## Qué hay aquí
 
