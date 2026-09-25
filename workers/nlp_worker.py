@@ -141,13 +141,18 @@ def procesar_nlp(data):
         # Segunda lectura solo de primer_apellido. No modifica otros campos.
         campos = aplicar_primer_apellido(campos, data.get('primer_apellido_vision'))
 
-        # Votacion de numeros: NLP + 2 lecturas pagina completa + recorte digitos.
+        # Votacion de numeros: NLP + 2 lecturas pagina completa + recorte digitos
+        # (solo si el recorte tiene formato plausible; un recorte basura no vota).
         reads = list(data.get('numeric_reads') or [])
         dig = data.get('digitos_vision') or {}
         extra = {}
         for field in ('numero_documento', 'telefono_movil'):
             v = (dig.get(field) or {}).get('valor') or ''
             v = re.sub(r'\D', '', str(v))
+            if field == 'telefono_movil' and not (len(v) == 10 and v.startswith('3')):
+                continue
+            if field == 'numero_documento' and not (6 <= len(v) <= 10):
+                continue
             if v:
                 extra[field] = v
         if extra:
