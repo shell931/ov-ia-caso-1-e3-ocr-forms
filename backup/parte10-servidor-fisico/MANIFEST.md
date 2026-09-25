@@ -1,16 +1,16 @@
 # Manifest Parte 10 — checksums (md5)
 # Paquete para desplegar tal cual la corrida publicada (25 sep 2026).
-# KPI: 89.6% vs gold_v2 · 88.4% vs gold · cedula 88%.
+# KPI: 89.6% vs gold_v2 · 88.4% vs gold · cedula 88% · 872 docs/h.
 
 8d6963c0c11929154dc0525a8321ecb2  ./docker-compose.yml
 735bb748b357c985281cbfdded57516a  ./gold_v2_resumen.json
-33db7d72d2cbbeeeebf237275d8e4eb8  ./IMPLEMENTACION.md
+c4a69ce50703569f8df4eae6f956e1fa  ./IMPLEMENTACION.md
 ed8bffc09f796f1f5a2b08c794eb8672  ./kpis/parte10-gold.json
 aea286cfea9014ecb8a404fa9124dab5  ./kpis/parte10v2-gold.json
-36eb992ed7f1b6b4fd8e4c8b65788caf  ./LEEME.md
+24a0f7f5b3e9f70eaed8586dbd0f1cb9  ./LEEME.md
 06c7469dc26aecee9e56e8dbeeb35eb2  ./scripts/add_parte10.py
 648718ae8af1826446c2fba33bc2c0ae  ./scripts/add_parte8.py
-d4054b040901331d93931a6ca1bc4128  ./scripts/build_parte10_fragment.py
+b006b0d776ae342a5cdf5b2da589670f  ./scripts/build_parte10_fragment.py
 7355488fcd7f9b127b4edea98d8f3466  ./scripts/build_parte8_fragment.py
 ef135c3830b77851598cbfce6f5f527a  ./scripts/compare_gold_fair.py
 f6e0099fb977a978e5bf2f0525fc9bd4  ./scripts/compare_gold.py

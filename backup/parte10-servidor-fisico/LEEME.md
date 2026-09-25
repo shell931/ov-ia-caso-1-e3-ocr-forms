@@ -11,6 +11,7 @@ Es la copia exacta del pipeline que midió y publicó **Parte 10**
 | `numero_documento` | **88 %** |
 | `telefono_movil` (gold / gold_v2) | 40 % / 58 % |
 | `tipo_discapacidad` | 91 % |
+| Throughput (docs/h, meta 1250) | **872** (~6 min 53 s / 100) |
 
 Visor: https://shell931.github.io/e3-pages/ — menú **Parte 10**.
 Detalle de diseño: `IMPLEMENTACION.md` en esta carpeta y

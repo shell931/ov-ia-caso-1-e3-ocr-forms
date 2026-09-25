@@ -22,6 +22,7 @@ Corrida aparte de la Parte 8. El visor menú **Parte 9** no pisa Parte 8.
 | Contra gold_v2 | — | **88,9 %** |
 | tipo_discapacidad | 82 % | **90 %** |
 | telefono_movil (gold / gold_v2) | 41 / — | 40 / **58** |
+| docs/h (meta 1250) | 968 | **917** (~6 min 32 s / 100) |
 
 La bajada 87,8 → 87,7 contra el gold original es jitter de la corrida
 nueva (imágenes distintas a nivel de un dígito en algunos campos). El
