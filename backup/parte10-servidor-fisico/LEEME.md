@@ -16,6 +16,37 @@ Visor: https://shell931.github.io/e3-pages/ — menú **Parte 10**.
 Detalle de diseño: `IMPLEMENTACION.md` en esta carpeta y
 `docs/parte10-resultados.md` en la raíz del repo.
 
+## En una frase (qué es Parte 10)
+
+Plan original: lector dedicado de dígitos (celular + cédula) + VL
+cuantizado *si hace falta VRAM*, midiendo siempre vs gold y vs gold_v2,
+sin pisar Parte 8/9.
+
+### De qué trata el lector dedicado de dígitos
+
+**No es otro modelo.** Es un paso extra del mismo pipeline:
+
+1. Recorta solo las cajas de **cédula**, **móvil** y **fijo** en el TIFF.
+2. Las amplía (escala 2) y se las pasa al VL pidiendo **solo dígitos**
+   (temperatura 0).
+3. Esa lectura entra al **voto** junto con NLP + las 2 lecturas de página
+   completa, y luego `aplicar_digitos` pisa el campo solo si el formato
+   es claro (móvil: 10 dígitos que empiezan por 3; cédula: 8–10 dígitos).
+   El fijo se lee pero **no se aplica** (en pruebas contaminaba con el
+   móvil de arriba).
+
+Código: `workers/digitos_vision.py`, flag `LEER_DIGITOS=1`.
+
+### ¿Se cuantizó el VL?
+
+**No.** El plan decía cuantizar *si hace falta VRAM* para meter un
+segundo modelo; no hizo falta como plan B: GPU0 ya tenía ~90 GB
+reservados con el Qwen2.5-VL-7B completo. En vez de cuantizar o meter
+RapidOCR/Paddle, se reutilizó ese mismo VL 7B sobre los recortes.
+
+El NLP sigue en AWQ (eso ya venía de antes). El VL de visión **no** se
+cuantizó en Parte 10. Parte 8 y Parte 9 del visor no se tocaron.
+
 No trae las imágenes TIFF ni el gold (datos personales). Hay que
 copiarlos aparte **mientras el servidor AWS siga encendido** (paso 1).
 
