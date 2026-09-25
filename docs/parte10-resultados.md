@@ -28,6 +28,7 @@ para un segundo modelo.
 | numero_documento | 86 % | 87 % | **88 %** |
 | telefono_movil (gold / gold_v2) | 41 / — | 40 / 58 | 40 / 58 |
 | tipo_discapacidad | 82 % | 90 % | 91 % |
+| docs/h (meta 1250) | 968 | 917 | **872** |
 
 El KPI de Parte 10 es el **89,6 % vs gold_v2**. La misma corrida mide
 **88,4 %** contra el gold original (sube respecto a Parte 8/9).

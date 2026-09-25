@@ -14,6 +14,7 @@ Detalle también en `docs/parte9-resultados.md` en la raíz del repo.
 | Contra `gold_v2` | — | **88,9 %** |
 | `tipo_discapacidad` | 82 % | **90 %** |
 | `telefono_movil` (gold / gold_v2) | 41 / — | 40 / **58** |
+| docs/h (meta 1250) | 968 | **917** |
 
 El KPI de Parte 9 es el **88,9 %** = promedio de celda contra `gold_v2`.
 

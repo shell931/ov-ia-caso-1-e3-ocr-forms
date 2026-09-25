@@ -132,6 +132,7 @@ Si no, se ignora (evita que basura tipo `1012345` gane el Counter).
 | `numero_documento` | 86 % | 87 % | **88 %** |
 | `telefono_movil` (gold / v2) | 41 / — | 40 / 58 | 40 / 58 |
 | `tipo_discapacidad` | 82 % | 90 % | 91 % |
+| docs/h (meta 1250) | 968 | 917 | **872** |
 
 Agregados sin PII: `kpis/parte10-gold.json` y `kpis/parte10v2-gold.json`.
 
