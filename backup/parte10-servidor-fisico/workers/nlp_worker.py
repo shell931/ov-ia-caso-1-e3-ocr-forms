@@ -198,7 +198,7 @@ def procesar_nlp(data):
                     fcampo['backfilled'] = True
 
         # El E3 no tiene estas cajas. Si el modelo igual las emite, se descartan.
-        _fuera = {"lugar_expedicion", "genero", "estado_civil", "votara"}
+        _fuera = {"lugar_expedicion", "genero", "estado_civil"}
         campos = [c for c in campos if c.get("etiqueta") not in _fuera]
 
         logger.info(f"[{doc_id}] NLP OK - {len(campos)} campos - {elapsed:.2f}s")
