@@ -164,28 +164,33 @@ def aplicar_digitos(campos: list, lectura: dict | None) -> list:
             continue
 
         usar = False
-        if not nlp and vision:
-            usar = True
-        elif campo == "telefono_movil":
-            # Preferir 10 digitos que empiezan por 3 si NLP no cumple eso.
+        if campo == "telefono_movil":
+            # Solo 10 digitos que empiezan por 3. Nunca acortar ni pisar
+            # otro movil bien formado (voto ya decidio).
             v_ok = len(vision) == 10 and vision.startswith("3")
+            if not v_ok:
+                continue
             n_ok = len(nlp) == 10 and nlp.startswith("3")
-            if v_ok and not n_ok:
+            if not nlp:
                 usar = True
-            elif v_ok and n_ok and vision != nlp:
-                # Empate de formato: no pisar (el voto ya decidio); solo si
-                # NLP parece truncado respecto al recorte.
-                if nlp and vision.startswith(nlp) and len(vision) > len(nlp):
-                    usar = True
+            elif not n_ok:
+                usar = True
+            elif vision.startswith(nlp) and len(vision) > len(nlp):
+                usar = True
         elif campo == "numero_documento":
-            if 6 <= len(vision) <= 10 and not (6 <= len(nlp) <= 10):
+            # 6-10 digitos; no acortar lo que NLP ya tiene.
+            if not (6 <= len(vision) <= 10):
+                continue
+            if not nlp:
                 usar = True
-            elif nlp and vision.startswith(nlp) and len(vision) > len(nlp):
+            elif not (6 <= len(nlp) <= 10):
+                usar = True
+            elif vision.startswith(nlp) and len(vision) > len(nlp):
                 usar = True
         elif campo == "telefono_fijo":
-            if len(vision) >= 7 and len(nlp) < 7:
-                usar = True
-            elif nlp and vision.startswith(nlp) and len(vision) > len(nlp):
+            # Muy conservador: solo rellena si NLP vino vacio y hay >=7 digitos.
+            # Completar gold incompleto de fijo suele bajar conf_real vs gold.
+            if not nlp and len(vision) >= 7:
                 usar = True
 
         if not usar:
