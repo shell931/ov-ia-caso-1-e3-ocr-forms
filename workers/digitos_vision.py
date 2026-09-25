@@ -178,20 +178,21 @@ def aplicar_digitos(campos: list, lectura: dict | None) -> list:
             elif vision.startswith(nlp) and len(vision) > len(nlp):
                 usar = True
         elif campo == "numero_documento":
-            # 6-10 digitos; no acortar lo que NLP ya tiene.
-            if not (6 <= len(vision) <= 10):
+            # En este lote casi todas las cedulas tienen 8-10 digitos (una de 4).
+            # Recortes de 6-7 suelen ser lecturas a medias: no las apliques.
+            if not (8 <= len(vision) <= 10):
                 continue
             if not nlp:
                 usar = True
-            elif not (6 <= len(nlp) <= 10):
+            elif not (8 <= len(nlp) <= 10):
                 usar = True
-            elif vision.startswith(nlp) and len(vision) > len(nlp):
+            elif len(vision) > len(nlp) and vision.startswith(nlp):
                 usar = True
+            # Empate de longitud o vision mas corta: no tocar.
         elif campo == "telefono_fijo":
-            # Muy conservador: solo rellena si NLP vino vacio y hay >=7 digitos.
-            # Completar gold incompleto de fijo suele bajar conf_real vs gold.
-            if not nlp and len(vision) >= 7:
-                usar = True
+            # OFF: el recorte de fijo a menudo lee el movil de arriba o
+            # completa gold incompleto y baja conf_real. Solo voto ced/movil.
+            continue
 
         if not usar:
             continue

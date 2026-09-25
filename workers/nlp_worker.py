@@ -151,7 +151,7 @@ def procesar_nlp(data):
             v = re.sub(r'\D', '', str(v))
             if field == 'telefono_movil' and not (len(v) == 10 and v.startswith('3')):
                 continue
-            if field == 'numero_documento' and not (6 <= len(v) <= 10):
+            if field == 'numero_documento' and not (8 <= len(v) <= 10):
                 continue
             if v:
                 extra[field] = v
