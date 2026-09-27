@@ -15,6 +15,78 @@ esta corrida quedó en el mismo orden (jitter).
 3. **Nombres/email**: refuerzo en el prompt de página completa (orden de
    cajas; letras parecidas). Sin reactivar `LEER_CONTACTO` / `LEER_APELLIDO`.
 
+## Qué cambió técnicamente (vs Parte 10)
+
+El stack Docker / colas / modelos no muda. Solo tres puntos en el worker OCR
+y el parse de casillas:
+
+```mermaid
+flowchart TB
+  subgraph in["Entrada — igual que Parte 10"]
+    Q1["Cola ocr_input\ndoc_id + ruta_imagen"]
+    OW["ocr_worker.py"]
+    Q1 --> OW
+  end
+
+  subgraph p11["Cambios Parte 11"]
+    direction TB
+
+    subgraph c1["1. Casillas — casillas_vision.py"]
+      CAS["LEER_CASILLAS=1\nPillow crop → VL"]
+      PARSE["parse_bloque tipo_discapacidad"]
+      R9["Parte 9/10:\nmarcadas == 2\ny NINGUNA ∈ set\n→ valor NINGUNA"]
+      R11["Parte 11:\nmarcadas ≥ 2\ny NINGUNA ∈ set\n→ valor NINGUNA"]
+      XFINA["Prompt nivel / braille:\nX pequeña o fina cuenta"]
+      REV["Probado y revertido:\nescala×3 + autocontraste\nen nivel_estudio"]
+      CAS --> PARSE
+      PARSE --> R9
+      R9 -->|ampliado| R11
+      CAS -.-> XFINA
+      CAS -.-> REV
+    end
+
+    subgraph c2["2. Throughput — digitos_vision.py"]
+      DIG["LEER_DIGITOS=1"]
+      CAMPOS["CAMPOS por defecto:\nnumero_documento\ntelefono_movil"]
+      SKIP["telefono_fijo omitido\nDIGITOS_LEER_FIJO=0\n−1 pasada VL / doc"]
+      APL["aplicar_digitos sigue\niterando CAMPOS_TODOS\nfijo no se aplica igual"]
+      DIG --> CAMPOS
+      CAMPOS --> SKIP
+      SKIP --> APL
+    end
+
+    subgraph c3["3. Prompt página — ocr_worker.py"]
+      VL["vLLM GPU0 :8001\npágina completa"]
+      ORD["Orden cajas:\n1er/2do apellido\nluego nombres"]
+      MAIL["Email: ojo n/h m/n a/o\nsin LEER_CONTACTO"]
+      VL --> ORD
+      VL --> MAIL
+    end
+  end
+
+  OW --> CAS
+  OW --> DIG
+  OW --> VL
+
+  subgraph out["Salida — igual"]
+    PACK["JSON doc_id:\ntexto_ocr, numeric_reads,\ncasillas, digitos_vision…"]
+    Q2["Cola ocr_output → NLP"]
+    PACK --> Q2
+  end
+
+  PARSE --> PACK
+  APL --> PACK
+  ORD --> PACK
+  MAIL --> PACK
+```
+
+| Archivo | Cambio | Flag / regla |
+| --- | --- | --- |
+| `workers/casillas_vision.py` | `marcadas == 2` → `marcadas >= 2` si hay `NINGUNA` | parse `tipo_discapacidad` |
+| `workers/casillas_vision.py` | Prompt: X fina cuenta en nivel/braille | texto del VL |
+| `workers/digitos_vision.py` | No llama VL a `telefono_fijo` | `DIGITOS_LEER_FIJO=0` |
+| `workers/ocr_worker.py` | Orden apellidos/nombres + letras email | prompt página completa |
+
 ## Números (100 docs)
 
 | Métrica | Parte 10 | Parte 11 |
