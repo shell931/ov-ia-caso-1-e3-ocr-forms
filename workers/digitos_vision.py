@@ -43,7 +43,12 @@ REGIONES = {
 }
 
 ESCALA = int(os.getenv("DIGITOS_ESCALA", "2"))
-CAMPOS = ("numero_documento", "telefono_movil", "telefono_fijo")
+# telefono_fijo se puede leer pero no se aplica (contaminaba). Por defecto
+# NO se llama al VL para fijo: ahorra ~1 pasada VL por formulario (throughput).
+# Activar con DIGITOS_LEER_FIJO=1 solo para depurar.
+CAMPOS_TODOS = ("numero_documento", "telefono_movil", "telefono_fijo")
+_LEER_FIJO = os.getenv("DIGITOS_LEER_FIJO", "0") == "1"
+CAMPOS = CAMPOS_TODOS if _LEER_FIJO else ("numero_documento", "telefono_movil")
 
 _PROMPT = {
     "numero_documento": """Esta imagen es SOLO la fila de casillas
@@ -132,7 +137,7 @@ def _leer_uno(client, modelo: str, ruta: str, campo: str) -> dict:
 
 
 def leer_digitos(ruta_imagen: str, client, modelo: str) -> dict:
-    """Devuelve {campo: {valor, evidencia, raw}} para cédula y teléfonos."""
+    """Devuelve {campo: {valor, evidencia, raw}} para cédula y (opcional) teléfonos."""
     return {c: _leer_uno(client, modelo, ruta_imagen, c) for c in CAMPOS}
 
 
@@ -148,7 +153,7 @@ def aplicar_digitos(campos: list, lectura: dict | None) -> list:
     - Si son iguales tras quitar no-digitos, solo marca fuente.
     """
     lectura = lectura or {}
-    for campo in CAMPOS:
+    for campo in CAMPOS_TODOS:
         info = lectura.get(campo) or {}
         if not info.get("evidencia"):
             continue
