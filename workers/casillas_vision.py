@@ -33,7 +33,7 @@ import os
 import re
 import unicodedata
 
-from PIL import Image
+from PIL import Image, ImageOps
 
 # Regiones en fracciones de (ancho, alto). LEE BRAILLE va aparte: en el pie
 # completo el VLM inventaba SI/VISUAL sobre cuadritos vacios (caso 6000000020).
