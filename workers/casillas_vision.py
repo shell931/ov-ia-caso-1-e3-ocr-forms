@@ -243,9 +243,11 @@ def recortar(ruta_imagen: str) -> dict:
         for region, (x0, y0, x1, y1) in REGIONES.items():
             caja = (int(x0 * W), int(y0 * H), int(x1 * W), int(y1 * H))
             rec = im.crop(caja)
-            # Escala 3 en lee_braille, tipo_documento y nivel_estudio (X finas).
+            # Escala 3 solo en lee_braille y tipo_documento (ya medido).
+            # nivel_estudio se deja en ESCALA=2: escala 3 + autocontraste
+            # bajó docs/h sin ganar braille en el lote.
             escala = ESCALA_PIE if region in (
-                "lee_braille", "tipo_documento", "nivel_estudio") else ESCALA
+                "lee_braille", "tipo_documento") else ESCALA
             if escala != 1:
                 rec = rec.resize((rec.width * escala, rec.height * escala),
                                  Image.LANCZOS)
