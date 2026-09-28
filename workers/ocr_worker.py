@@ -25,11 +25,19 @@ logger = logging.getLogger(__name__)
 RABBIT_URL = os.getenv('RABBIT_URL', 'amqp://guest:guest@localhost:5672/')
 VLLM_VL_URL = os.getenv('VLLM_VL_URL', 'http://localhost:8001/v1')
 VL_MODEL = os.getenv('VLLM_VL_MODEL', 'Qwen/Qwen2.5-VL-7B-Instruct')
+# Parte 12: VL más chico solo para digitos/casillas (crops). Vacío = mismo 7B.
+VLLM_VL_SMALL_URL = os.getenv('VLLM_VL_SMALL_URL', '').strip()
+VL_SMALL_MODEL = os.getenv(
+    'VLLM_VL_SMALL_MODEL', 'Qwen/Qwen2.5-VL-3B-Instruct')
 DATA_DIR = os.getenv('DATA_DIR', '/data/e3')
 WORKER_ID = os.getenv('HOSTNAME', 'ocr-worker')
 
 # Cliente OpenAI (vLLM es compatible)
 client_vl = OpenAI(base_url=VLLM_VL_URL, api_key="not-needed")
+client_vl_small = (
+    OpenAI(base_url=VLLM_VL_SMALL_URL, api_key="not-needed")
+    if VLLM_VL_SMALL_URL else None
+)
 
 VLM_PROMPT = """Este es un formulario E3 o E4 del Consulado colombiano.
 
@@ -92,8 +100,15 @@ LEER_CONTACTO = os.getenv('LEER_CONTACTO', '0') == '1'
 LEER_APELLIDO = os.getenv('LEER_APELLIDO', '0') == '1'
 
 # Lectura dedicada de digitos (cedula + telefonos) sobre recortes ampliados.
-# Parte 10: mismo VL 7B (no hay VRAM libre para otro modelo). Ver digitos_vision.
+# Parte 10: mismo VL 7B. Parte 12: opcional VL chico via VLLM_VL_SMALL_URL.
 LEER_DIGITOS = os.getenv('LEER_DIGITOS', '1') == '1'
+
+
+def _cliente_crops():
+    """Cliente/modelo para digitos y casillas (crops). Preferir VL chico."""
+    if client_vl_small is not None:
+        return client_vl_small, VL_SMALL_MODEL
+    return client_vl, VL_MODEL
 
 
 def _leer_numeros_focalizado(img_base64, temp):
@@ -177,9 +192,12 @@ def procesar_ocr_vlm(ruta_imagen):
 
         # Casillas: una pasada por cada banda recortada, con la imagen original
         # (no el base64 de la pagina completa) para poder recortar y ampliar.
+        crop_client, crop_model = _cliente_crops()
+
         if LEER_CASILLAS:
             try:
-                salida['casillas'] = leer_casillas(ruta_imagen, client_vl, VL_MODEL)
+                salida['casillas'] = leer_casillas(
+                    ruta_imagen, crop_client, crop_model)
             except Exception as e:
                 logger.warning(f"lectura de casillas fallo: {e}")
 
@@ -198,7 +216,8 @@ def procesar_ocr_vlm(ruta_imagen):
 
         if LEER_DIGITOS:
             try:
-                salida['digitos_vision'] = leer_digitos(ruta_imagen, client_vl, VL_MODEL)
+                salida['digitos_vision'] = leer_digitos(
+                    ruta_imagen, crop_client, crop_model)
             except Exception as e:
                 logger.warning(f"lectura de digitos fallo: {e}")
 

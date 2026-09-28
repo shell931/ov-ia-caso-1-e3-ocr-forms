@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
 """Lectura dedicada de digitos: numero_documento y telefonos sobre recortes.
 
-Parte 10: misma Qwen2.5-VL-7B (no hay VRAM libre para un segundo modelo;
-GPU0 ~89 GB / GPU1 ~40 GB reservados). En vez de cuantizar, se recorta la
-caja de cédula (casillas) y la de celular/fijo, se amplía y se pide SOLO
-digitos a temperatura 0.
+Parte 10: misma Qwen2.5-VL-7B sobre el recorte (crop + escala×2).
+Parte 12: si el OCR worker define VLLM_VL_SMALL_URL, digitos/casillas
+van a un VL más chico (p.ej. Qwen2.5-VL-3B) en GPU1; página completa
+sigue en el 7B.
 
 El resultado entra al voto numerico del NLP junto con las lecturas de pagina
 completa (VOTE_NUMERIC).
