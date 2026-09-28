@@ -111,4 +111,5 @@ Nivel TECNICO y braille NO siguen en falso negativo (X visible, VL=0).
 - Nombres/email/dirección: el prompt solo no mueve el KPI; hace falta
   otro enfoque o modelo, no más crops con el 7B.
 
-Código en rama `cursor/parte11-casillas-throughput-b8cd`.
+Backup redeploy: `backup/parte11-servidor-fisico/` (LEEME + Mermaid).
+Visor: https://shell931.github.io/e3-pages/ — menú **Parte 11** (hard refresh).

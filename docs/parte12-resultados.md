@@ -41,4 +41,6 @@ en el 7B; mover crops a 3B no acerca a 1250.
   perfil vLLM, no un segundo modelo más chico para casillas.
 - Código queda con el cableado opcional (`VLLM_VL_SMALL_URL`); default vacío.
 
-Rama: `cursor/parte12-vl-chico-digitos-b8cd`.
+Backup redeploy: `backup/parte12-servidor-fisico/` (LEEME + Mermaid).
+Visor: https://shell931.github.io/e3-pages/ — menú **Parte 12** (hard refresh;
+marcado como experimento descartado).

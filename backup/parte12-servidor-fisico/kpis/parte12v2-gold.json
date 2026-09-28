@@ -1,0 +1,202 @@
+{
+  "lote": "parte12v2",
+  "prefijo": "",
+  "generado": "2026-09-28T13:21:35+00:00",
+  "gold_docs": 100,
+  "jobs": 100,
+  "comparaciones": 1790,
+  "conf_declarada": 87.7,
+  "conf_real": 71.0,
+  "brecha": 16.7,
+  "veredictos": {
+    "exacto": 1073,
+    "distinto": 185,
+    "vacio_modelo": 380,
+    "sobra_modelo": 9,
+    "casi": 143
+  },
+  "falsos_100": 120,
+  "umbral_casi": 85,
+  "campos": [
+    {
+      "etiqueta": "formulario_no",
+      "n": 100,
+      "exacto": 100.0,
+      "casi": 0.0,
+      "malo": 0.0,
+      "conf_declarada": 92.1,
+      "conf_real": 100.0,
+      "brecha": -7.9
+    },
+    {
+      "etiqueta": "fecha_inscripcion",
+      "n": 100,
+      "exacto": 88.0,
+      "casi": 0.0,
+      "malo": 12.0,
+      "conf_declarada": 94.0,
+      "conf_real": 88.0,
+      "brecha": 6.0
+    },
+    {
+      "etiqueta": "tipo_documento",
+      "n": 100,
+      "exacto": 28.0,
+      "casi": 0.0,
+      "malo": 72.0,
+      "conf_declarada": 91.3,
+      "conf_real": 28.0,
+      "brecha": 63.3
+    },
+    {
+      "etiqueta": "numero_documento",
+      "n": 100,
+      "exacto": 84.0,
+      "casi": 0.0,
+      "malo": 16.0,
+      "conf_declarada": 98.9,
+      "conf_real": 84.0,
+      "brecha": 14.9
+    },
+    {
+      "etiqueta": "fecha_expedicion",
+      "n": 100,
+      "exacto": 89.0,
+      "casi": 0.0,
+      "malo": 11.0,
+      "conf_declarada": 93.1,
+      "conf_real": 89.0,
+      "brecha": 4.1
+    },
+    {
+      "etiqueta": "primer_apellido",
+      "n": 100,
+      "exacto": 72.0,
+      "casi": 10.0,
+      "malo": 18.0,
+      "conf_declarada": 95.8,
+      "conf_real": 90.4,
+      "brecha": 5.4
+    },
+    {
+      "etiqueta": "segundo_apellido",
+      "n": 100,
+      "exacto": 77.0,
+      "casi": 8.0,
+      "malo": 15.0,
+      "conf_declarada": 94.8,
+      "conf_real": 91.9,
+      "brecha": 2.9
+    },
+    {
+      "etiqueta": "primer_nombre",
+      "n": 100,
+      "exacto": 76.0,
+      "casi": 6.0,
+      "malo": 18.0,
+      "conf_declarada": 95.9,
+      "conf_real": 90.8,
+      "brecha": 5.1
+    },
+    {
+      "etiqueta": "segundo_nombre",
+      "n": 100,
+      "exacto": 76.0,
+      "casi": 7.0,
+      "malo": 17.0,
+      "conf_declarada": 77.2,
+      "conf_real": 91.6,
+      "brecha": -14.4
+    },
+    {
+      "etiqueta": "nivel_estudio",
+      "n": 100,
+      "exacto": 1.0,
+      "casi": 0.0,
+      "malo": 99.0,
+      "conf_declarada": 90.0,
+      "conf_real": 1.0,
+      "brecha": 89.0
+    },
+    {
+      "etiqueta": "email",
+      "n": 100,
+      "exacto": 34.0,
+      "casi": 51.0,
+      "malo": 15.0,
+      "conf_declarada": 93.2,
+      "conf_real": 90.5,
+      "brecha": 2.7
+    },
+    {
+      "etiqueta": "telefono_movil",
+      "n": 100,
+      "exacto": 59.0,
+      "casi": 0.0,
+      "malo": 41.0,
+      "conf_declarada": 75.7,
+      "conf_real": 59.0,
+      "brecha": 16.7
+    },
+    {
+      "etiqueta": "telefono_fijo",
+      "n": 90,
+      "exacto": 76.7,
+      "casi": 0.0,
+      "malo": 23.3,
+      "conf_declarada": 22.2,
+      "conf_real": 76.7,
+      "brecha": -54.5
+    },
+    {
+      "etiqueta": "ciudad",
+      "n": 100,
+      "exacto": 78.0,
+      "casi": 9.0,
+      "malo": 13.0,
+      "conf_declarada": 96.2,
+      "conf_real": 92.5,
+      "brecha": 3.7
+    },
+    {
+      "etiqueta": "direccion",
+      "n": 100,
+      "exacto": 26.0,
+      "casi": 52.0,
+      "malo": 22.0,
+      "conf_declarada": 91.8,
+      "conf_real": 88.4,
+      "brecha": 3.4
+    },
+    {
+      "etiqueta": "lee_braille",
+      "n": 100,
+      "exacto": 19.0,
+      "casi": 0.0,
+      "malo": 81.0,
+      "conf_declarada": 90.0,
+      "conf_real": 19.0,
+      "brecha": 71.0
+    },
+    {
+      "etiqueta": "tipo_discapacidad",
+      "n": 100,
+      "exacto": 11.0,
+      "casi": 0.0,
+      "malo": 89.0,
+      "conf_declarada": 90.0,
+      "conf_real": 11.0,
+      "brecha": 79.0
+    },
+    {
+      "etiqueta": "etnia",
+      "n": 100,
+      "exacto": 86.0,
+      "casi": 0.0,
+      "malo": 14.0,
+      "conf_declarada": 90.0,
+      "conf_real": 86.0,
+      "brecha": 4.0
+    }
+  ]
+}
