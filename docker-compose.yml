@@ -6,8 +6,9 @@ x-app-env: &app-env
   VLLM_URL: http://vllm:8000/v1
   VLLM_VL_URL: http://vllm-vl:8000/v1
   VLLM_VL_MODEL: Qwen/Qwen2.5-VL-7B-Instruct
-  # Parte 12: VL chico solo digitos/casillas (GPU1, puerto 8002). Vacío = 7B.
-  VLLM_VL_SMALL_URL: http://vllm-vl-small:8000/v1
+  # Parte 12: VL chico digitos/casillas. Medido 3B → casillas colapsan;
+  # docs/h sin ganancia. Dejar vacío (=7B). Activar solo para re-probar.
+  VLLM_VL_SMALL_URL: ""
   VLLM_VL_SMALL_MODEL: Qwen/Qwen2.5-VL-3B-Instruct
   NLP_MODEL: Qwen/Qwen2.5-7B-Instruct-AWQ
 
@@ -147,8 +148,7 @@ services:
         condition: service_healthy
       vllm-vl:
         condition: service_started
-      vllm-vl-small:
-        condition: service_started
+      # vllm-vl-small: opcional (Parte 12). No depende: default URL vacía.
     environment:
       <<: *app-env
     volumes:

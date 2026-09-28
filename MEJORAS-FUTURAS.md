@@ -36,6 +36,10 @@ casillas, dirección, dígitos). Parte 10 bajó docs/h al sumar crops.
 3. Escalar workers OCR/NLP solo si la GPU no está al 100 % (si GPU satura,
    más workers empeoran cola).
 4. Dos GPUs VL o modelo más chico solo para dígitos/casillas.
+   **Probado (Parte 12):** Qwen2.5-VL-3B en GPU1 para dígitos/casillas →
+   conf_real **69,8 %** (casillas ~1–28 %) y docs/h **igual** (~872).
+   Descartado con 3B; cableado queda opcional (`VLLM_VL_SMALL_URL`).
+   Ver `docs/parte12-resultados.md`.
 
 **Qué se necesita:**
 
