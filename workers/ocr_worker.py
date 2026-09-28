@@ -43,8 +43,11 @@ INSTRUCCIONES:
 IMPORTANTE:
 - Nombres y apellidos: transcribe la ortografía EXACTA que ves. NO completes ni expandas
   (ej. si ves "alex", escribe "alex", no "alejandro"; no agregues puntos ni letras).
+  Respeta el ORDEN de las cajas: primer_apellido, segundo_apellido, primer_nombre,
+  segundo_nombre. No intercambies apellido con nombre.
 - Emails: copia carácter por carácter (usuario, @ y dominio) tal como está escrito.
   NO completes ni expandas el usuario, NO inventes el dominio.
+  Ojo con letras parecidas (n/h, m/n, a/o) en el usuario del correo.
 - Números (documento, teléfonos, fechas, número de formulario): léelos DÍGITO POR DÍGITO
   con cuidado; no agregues ni quites dígitos; ojo con 0/O, 1/l/7, 5/S, 6/8.
 - Para direcciones: "Cll" no "C11", "#" no "+", separar números y letras

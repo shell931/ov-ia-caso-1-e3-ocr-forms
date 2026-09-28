@@ -111,7 +111,8 @@ tipo_documento.CEDULA_EXTRANJERIA=[ ]
 Hay 5 cuadritos en una sola fila. De izquierda a derecha, cada etiqueta va
 seguida de su cuadrito: NINGUNO, PRIMARIA, BACHILLERATO, TÉCNICO, PROFESIONAL.
 
-Recorre la fila de izquierda a derecha y reporta el estado de cada cuadrito:
+Recorre la fila de izquierda a derecha y reporta el estado de cada cuadrito.
+Una X pequeña o fina DENTRO del cuadrito cuenta como marcada ([X]).
 
 CASILLAS:
 nivel_estudio.NINGUNO=
@@ -123,6 +124,9 @@ nivel_estudio.PROFESIONAL=
 
     "lee_braille": """Esta imagen es SOLO el grupo LEE BRAILLE de un formulario E3
 (dos cuadritos: SI a la izquierda, NO a la derecha).
+
+Una X pequeña o fina DENTRO del cuadrito cuenta como marcada ([X]).
+La etiqueta impresa SI/NO no es una marca.
 
 CASILLAS:
 lee_braille.SI=[ ]
@@ -239,8 +243,11 @@ def recortar(ruta_imagen: str) -> dict:
         for region, (x0, y0, x1, y1) in REGIONES.items():
             caja = (int(x0 * W), int(y0 * H), int(x1 * W), int(y1 * H))
             rec = im.crop(caja)
-            # Escala 3 en lee_braille y tipo_documento (detectar vacio vs marca fina).
-            escala = ESCALA_PIE if region in ("lee_braille", "tipo_documento") else ESCALA
+            # Escala 3 solo en lee_braille y tipo_documento (ya medido).
+            # nivel_estudio se deja en ESCALA=2: escala 3 + autocontraste
+            # bajó docs/h sin ganar braille en el lote.
+            escala = ESCALA_PIE if region in (
+                "lee_braille", "tipo_documento") else ESCALA
             if escala != 1:
                 rec = rec.resize((rec.width * escala, rec.height * escala),
                                  Image.LANCZOS)
@@ -293,13 +300,13 @@ def parse_bloque(texto: str, campos: tuple) -> dict:
             valor = marcadas[0]
         elif (
             campo == "tipo_discapacidad"
-            and len(marcadas) == 2
+            and len(marcadas) >= 2
             and "NINGUNA" in marcadas
         ):
-            # En el pie del E3 a menudo queda una segunda marca fantasma junto a
-            # NINGUNA. Si se blanquea el campo, se pierden ~14 exactos. Se conserva
-            # NINGUNA. Caso conocido que sigue mal: 6000000058 (NINGUNA+VISUAL,
-            # gold VISUAL).
+            # En el pie del E3 a menudo quedan marcas fantasma (ruido / casilla
+            # vecina) junto a NINGUNA. Antes solo se salvaba marcadas==2; con 3+
+            # (p.ej. 6000000042) el campo quedaba vacío. Se conserva NINGUNA.
+            # Caso conocido que sigue mal: 6000000058 (NINGUNA+VISUAL, gold VISUAL).
             valor = "NINGUNA"
         salida[campo] = {
             "valor": valor,
