@@ -20,20 +20,17 @@ REGION = (
     float(os.getenv("COM_X0", "0.715")),
     float(os.getenv("COM_Y0", "0.72")),
     float(os.getenv("COM_X1", "0.975")),
-    float(os.getenv("COM_Y1", "0.82")),
+    float(os.getenv("COM_Y1", "0.84")),
 )
 ESCALA = int(os.getenv("COM_ESCALA", "2"))
 
-PROMPT = """Esta imagen es SOLO la caja "A QUE COMUNIDAD DE LA ETNIA PERTENECE"
-de un formulario E3 colombiano. El título impreso arriba NO es la respuesta.
+PROMPT = """Imagen: recorte de un formulario. Arriba está impreso el título
+"A QUE COMUNIDAD DE LA ETNIA PERTENECE" (no lo copies). Debajo, a mano,
+la persona escribió una respuesta corta (por ejemplo Ninguna, No aplica, N/A,
+o el nombre de una comunidad).
 
-Transcribe EXACTAMENTE el texto manuscrito dentro de la caja, en una línea.
-- Copia lo escrito tal cual: "Ninguna", "No aplica", "N/A", "NA", un nombre
-  de pueblo o comunidad (Wayuu, Pijao, Inga…), etc.
-- NO corrijas, NO completes, NO traduzcas.
-- Si la caja no tiene nada escrito responde exactamente: VACIO
-
-Respuesta: solo el texto (o VACIO), sin comillas ni explicación.
+¿Qué escribió a mano? Copia el texto manuscrito tal cual, en una línea.
+Solo si debajo del título no hay ningún trazo de tinta responde: VACIO
 """
 
 
@@ -51,6 +48,8 @@ def limpiar(texto: str) -> str:
         return ""
     if "a que comunidad" in _norm(s):
         return ""
+    # El VL suele cerrar con un punto que no está en la caja ("Ninguna.").
+    s = re.sub(r"[.,;:]+$", "", s).strip()
     return re.sub(r"\s+", " ", s).strip()
 
 
