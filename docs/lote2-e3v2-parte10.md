@@ -11,11 +11,11 @@ sobre un lote nuevo de formularios, en un servidor AWS nuevo (2 oct 2026).
 | Procesados | 267/267, 0 errores |
 | Tiempo | 18 min 21 s |
 | Throughput | **873 docs/h** (Parte 10 original: 872) |
-| KPI conf_real | **No disponible**: el lote no tiene gold todavía |
+| KPI conf_real | **92,2 %** vs `gold_e3` (267 docs, 4775 celdas) |
 
 Visor: https://shell931.github.io/e3-pages/ — menú **Lote E3V2 . Parte 10**.
-La confianza que muestra es la **declarada** por el extractor, no la
-oficial; no se puede comparar con el 89,6 % de Parte 10.
+Es otro lote y otro gold: el 92,2 % no se compara uno a uno con el 89,6 %
+de Parte 10 (vs `gold_v2`).
 
 También se bajó `s3://forme3/E3V2/finger_500/` (267, 500 dpi) a
 `/data/e3/finger/`; Parte 10 solo usa el frente.
@@ -59,14 +59,65 @@ después del `;`). Copias, no symlinks: los contenedores solo montan
 | telefono_movil | 11 |
 | segundo_apellido | 10 |
 
-## Para tener KPI oficial
+## KPI oficial vs gold_e3
 
-Hace falta `gold.json` de estos 267 (mismo formato que el gold de Parte 10).
-Con el gold en `/data/e3/gold/`, se corre:
+Gold: `gold_e3.csv` (transcripción del operador, 267 filas, mismos ids).
+En el servidor: `/data/e3/gold/gold_lote2.json`. No va a git (PII).
+Agregado sin PII: [`lote2-gold-kpis.json`](lote2-gold-kpis.json).
+
+| Campo | conf_real | exacto | conf. declarada |
+| --- | ---: | ---: | ---: |
+| tipo_documento | 100,0 | 100,0 | 94,9 |
+| formulario_no | 99,6 | 99,6 | 91,4 |
+| ciudad | 97,0 | 91,0 | 97,3 |
+| nivel_estudio | 95,1 | 95,1 | 94,2 |
+| primer_nombre | 94,7 | 83,9 | 98,3 |
+| email | 94,2 | 41,0 | 96,4 |
+| primer_apellido | 94,0 | 80,1 | 98,5 |
+| fecha_inscripcion | 93,6 | 93,6 | 95,0 |
+| fecha_expedicion | 93,6 | 93,6 | 94,6 |
+| segundo_apellido | 93,6 | 80,5 | 94,5 |
+| segundo_nombre | 93,6 | 83,9 | 81,9 |
+| tipo_discapacidad | 93,3 | 93,3 | 90,7 |
+| lee_braille | 90,3 | 90,3 | 94,5 |
+| direccion | 89,9 | 16,1 | 93,6 |
+| telefono_fijo | 88,2 | 88,2 | 21,5 |
+| numero_documento | 86,1 | 86,1 | 99,6 |
+| etnia | 85,8 | 85,8 | 91,1 |
+| telefono_movil | 75,7 | 75,7 | 80,0 |
+| **Total** | **92,2** | 82,1 | 89,8 |
+
+Lo más débil: `telefono_movil` (75,7) y `numero_documento` (86,1, con
+99,6 declarado: es la brecha más peligrosa). 228 celdas salen con 100 %
+declarado y son distintas al gold.
+
+### Cómo se pasó el CSV a gold.json
+
+`scripts/lote2/gold_csv_to_json.py` aplica las mismas normalizaciones que
+el pipeline aplica a su salida:
+
+- Casillas con 2 o más marcas → vacío (el pipeline deja vacío con
+  `marcadas≥2`): etnia 13, braille 6, discapacidad 5, nivel 3.
+- `CEDULA DE CIUDADANIA` → `CEDULA_CIUDADANIA`, `COM.NEGRAS` →
+  `COM_NEGRAS`, `ROM (GITANA)` → `ROM`.
+- Teléfonos solo dígitos; `N/A` → vacío; `+57` delante se quita.
+- `BOGOTA D.C` / `DC` → `BOGOTA` (`corregir_ciudad` colapsa todo a Bogotá).
+- Nombres, correo y dirección quedan tal cual; `compare_gold_real.py`
+  ya ignora mayúsculas y tildes.
+
+### Cómo repetir
 
 ```bash
+python3 scripts/lote2/gold_csv_to_json.py gold_e3.csv /data/e3/gold/gold_lote2.json
 python3 scripts/compare_gold_real.py /data/e3/gold/gold_lote2.json \
   /data/e3/preds_lote2.json "" lote2
+python3 scripts/lote2/build_lote2_gold_fragment.py \
+  /data/e3/resultados_lote2_parte10.jsonl /data/e3/lote2-gold.json \
+  /data/e3/lote2-gold-docs.json /data/e3/lote2_parte10_gold_vault_fragment.json \
+  873 "18 min 21 s"
+python3 scripts/lote2/add_fragment.py <usuario> <clave> data/vault.json \
+  lote2_parte10_gold_vault_fragment.json lote2p10   # dentro de e3-pages
 ```
 
+`preds_lote2.json` sale de `scripts/lote2/preds_lote2.py` (jsonl → `id` = `doc_id` y `estado` = `listo`).
 Scripts de la corrida: `scripts/lote2/`.
