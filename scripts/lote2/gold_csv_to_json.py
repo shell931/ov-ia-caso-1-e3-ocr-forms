@@ -9,6 +9,7 @@ Convenciones (las mismas que aplica el pipeline a su salida):
     ROM (GITANA) -> ROM
   - teléfonos solo dígitos; N/A -> vacío; prefijo 57 de 12 dígitos fuera
   - BOGOTA D.C / DC -> BOGOTA (corregir_ciudad colapsa todas a Bogotá)
+  - comunidad_etnia literal (Ninguna, No aplica, N/A…)
 El JSON resultante tiene PII: va solo al servidor, nunca a git.
 """
 import csv
@@ -35,6 +36,7 @@ COLS = {
     "lee_braille": "LEE BRAILLE",
     "tipo_discapacidad": "TIPO DE DISCAPACIDAD",
     "etnia": "ETNIA",
+    "comunidad_etnia": "A QUE COMUNIDAD DE LA ETNIA PERTENECE",
 }
 CASILLAS = {"tipo_documento", "nivel_estudio", "lee_braille", "tipo_discapacidad", "etnia"}
 ALIAS = {
