@@ -12,6 +12,7 @@ from openai import OpenAI
 from casillas_vision import leer_casillas
 from direccion_vision import leer_direccion
 from comunidad_vision import leer_comunidad
+from pagina_e3 import normalizar as normalizar_pagina
 from contacto_vision import leer_contacto
 from primer_apellido_vision import leer_primer_apellido
 from digitos_vision import leer_digitos
@@ -262,8 +263,26 @@ def callback(ch, method, properties, body):
             ch.basic_nack(delivery_tag=method.delivery_tag, requeue=False)
             return
         
+        # E-3 + E-4 en una sola página: se procesa solo el E-3. Ver pagina_e3.
+        ruta_proc, pagina = ruta_imagen, {}
+        try:
+            ruta_proc, pagina = normalizar_pagina(ruta_imagen, doc_id)
+            if pagina.get('recortada'):
+                logger.info(f"[{doc_id}] página alta {pagina['original']} -> E-3 {pagina['usada']}")
+        except Exception as e:
+            logger.warning(f"[{doc_id}] no se pudo revisar el tamaño de página: {e}")
+
         # Procesar con VLM
-        resultado_ocr = procesar_ocr_vlm(ruta_imagen)
+        try:
+            resultado_ocr = procesar_ocr_vlm(ruta_proc)
+        finally:
+            if ruta_proc != ruta_imagen:
+                try:
+                    os.remove(ruta_proc)
+                except OSError:
+                    pass
+        if pagina:
+            resultado_ocr['pagina'] = pagina
         
         # Preparar para siguiente stage
         resultado = {
