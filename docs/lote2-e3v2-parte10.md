@@ -149,3 +149,40 @@ Copia del worker que corrió en el servidor: `backup/lote2-e3v2-servidor/`.
 
 Visor: menú **Lote E3V2 . Parte 10 + comunidad tapada**. La corrida anterior
 sigue en su menú. KPIs sin PII: `docs/lote2-comunidad-tapada-gold-kpis.json`.
+
+## Campo nuevo: comunidad_etnia
+
+A QUE COMUNIDAD DE LA ETNIA PERTENECE no lo leía el pipeline. Ahora hay un
+lector propio (`workers/comunidad_vision.py`, `LEER_COMUNIDAD=1`): recorte
+de la caja (x 0,715–0,975 · y 0,72–0,84), escala 2, VL 7B, transcripción
+literal y sin punto final. El gold lo trae literal (Ninguna, No aplica, N/A…).
+
+Variantes medidas sobre los 267 (solo la lectura del campo, vs gold_e3):
+
+| Variante | conf_real | exacto |
+| --- | ---: | ---: |
+| Primer prompt, y hasta 0,82 | 91,9 % | 81,3 % |
+| Sin título impreso, y hasta 0,84, sin punto final | 94,4 % | 89,1 % |
+| **Prompt nuevo, y hasta 0,84, sin punto final (elegida)** | **95,3 %** | 90,6 % |
+
+El primer prompt respondía VACIO con texto escrito ("N/A", "Ninguna" bajo el
+título) y cortaba textos escritos abajo de la caja.
+
+Corrida completa con el campo (pipeline Parte 10 + comunidad tapada +
+comunidad_etnia):
+
+| Métrica | Valor |
+| --- | ---: |
+| comunidad_etnia | **95,3 %** |
+| KPI oficial (19 campos) | **92,1 %** |
+| Los 18 campos de antes | 91,9 % (ruido entre corridas: 91,9–92,6) |
+| docs/h | 854 (una llamada VL más por documento) |
+
+Pendiente: 10 frentes (`6000000108`, `109`, `141`, `153`, `154`, `194`,
+`203`, `237`, `238`, `239`) son una página alta con E-3 + E-4 (2499×3307).
+Todos los recortes están en fracciones de página, así que en esas 10 no caen
+en su caja (6 de los 16 vacíos de comunidad son de ahí). Arreglo propuesto:
+recortar la mitad E-3 antes de procesar.
+
+Visor: menú **Lote E3V2 . Parte 10 + comunidad_etnia**. KPIs sin PII:
+`docs/lote2-comunidad-etnia-gold-kpis.json`.
