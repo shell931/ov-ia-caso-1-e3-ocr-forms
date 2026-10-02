@@ -121,3 +121,31 @@ python3 scripts/lote2/add_fragment.py <usuario> <clave> data/vault.json \
 
 `preds_lote2.json` sale de `scripts/lote2/preds_lote2.py` (jsonl → `id` = `doc_id` y `estado` = `listo`).
 Scripts de la corrida: `scripts/lote2/`.
+
+## Arreglo: "A QUE COMUNIDAD" se leía como discapacidad
+
+Caso `6000000041`: todos los cuadritos de TIPO DE DISCAPACIDAD vacíos (gold
+vacío) y el modelo devolvía `NINGUNA` con una sola marca. El recorte
+`pie_resto` (x 0,195–0,90) incluía la caja A QUE COMUNIDAD DE LA ETNIA
+PERTENECE, con "Ninguna" manuscrito, y el VL lo tomó como la casilla.
+
+Arreglo en `workers/casillas_vision.py`: el recorte mantiene su tamaño, pero
+desde x = 0,73 de la página se pinta de blanco (`CASILLAS_PIE_BLANCO_X`).
+Copia del worker que corrió en el servidor: `backup/lote2-e3v2-servidor/`.
+
+| Corrida (mismo lote, mismo gold) | KPI | discapacidad | etnia | docs/h |
+| --- | ---: | ---: | ---: | ---: |
+| Parte 10 tal cual | 92,2 % | 93,3 % | 85,8 % | 873 |
+| Recorte angosto (x1 = 0,73), descartado | 92,6 % | 95,1 % | 85,0 % | 897 |
+| **Comunidad tapada (oficial)** | **92,1 %** | 93,3 % | 89,1 % | 871 |
+
+- `6000000041` queda vacío (= gold) en las dos variantes.
+- En este lote es el único formulario con discapacidad en blanco y
+  "Ninguna" escrito en comunidad; los otros 3 vacíos ya salían bien.
+- Las diferencias de total son ruido entre corridas: con `temperature=0`
+  el batching de vLLM cambia ~30 celdas de etnia entre corridas idénticas
+  (±0,3 pts en el total). El recorte angosto se descartó porque cambia la
+  escala del recorte; tapar no toca la geometría de lo que ya se validó.
+
+Visor: menú **Lote E3V2 . Parte 10 + comunidad tapada**. La corrida anterior
+sigue en su menú. KPIs sin PII: `docs/lote2-comunidad-tapada-gold-kpis.json`.

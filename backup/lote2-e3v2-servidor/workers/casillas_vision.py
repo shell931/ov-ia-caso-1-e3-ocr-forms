@@ -43,11 +43,15 @@ REGIONES = {
     "tipo_documento": (0.42, 0.18, 0.72, 0.33),
     "nivel_estudio": (0.02, 0.55, 0.82, 0.62),
     "lee_braille": (0.015, 0.735, 0.22, 0.815),
-    # El borde derecho corta antes de "A QUE COMUNIDAD DE LA ETNIA PERTENECE":
-    # un "Ninguna" manuscrito ahí se leía como tipo_discapacidad.NINGUNA
-    # marcada con todos los cuadritos vacíos (6000000041).
-    "pie_resto": (0.195, 0.70, float(os.getenv("CASILLAS_PIE_X1", "0.73")), 0.87),
+    "pie_resto": (0.195, 0.70, 0.90, 0.87),
 }
+
+# Desde esta x (fracción de página) el recorte se pinta de blanco: tapa
+# "A QUE COMUNIDAD DE LA ETNIA PERTENECE", donde un "Ninguna" manuscrito se
+# leía como tipo_discapacidad.NINGUNA con los cuadritos vacíos (6000000041).
+# Se blanquea en vez de recortar para no cambiar la escala del recorte: con un
+# recorte más angosto la lectura de etnia se movía en ~35 de 267 documentos.
+BLANQUEAR_DESDE = {"pie_resto": float(os.getenv("CASILLAS_PIE_BLANCO_X", "0.73"))}
 
 # Escala 3 en el pie: las marcas reales de SI (minoritarias) se ven mejor; en
 # nivel_estudio se mantiene 2 (ya medido). Override con CASILLAS_ESCALA.
@@ -242,6 +246,9 @@ def recortar(ruta_imagen: str) -> dict:
         for region, (x0, y0, x1, y1) in REGIONES.items():
             caja = (int(x0 * W), int(y0 * H), int(x1 * W), int(y1 * H))
             rec = im.crop(caja)
+            xb = BLANQUEAR_DESDE.get(region)
+            if xb is not None and xb < x1:
+                rec.paste(255, (int(xb * W) - caja[0], 0, rec.width, rec.height))
             # Escala 3 en lee_braille y tipo_documento (detectar vacio vs marca fina).
             escala = ESCALA_PIE if region in ("lee_braille", "tipo_documento") else ESCALA
             if escala != 1:

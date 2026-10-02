@@ -2,7 +2,7 @@
 """Fragmento del visor para el lote E3V2 con gold: KPI oficial = conf_real vs gold_e3.
 
 Uso: python3 build_lote2_gold_fragment.py <resultados.jsonl> <lote2-gold.json>
-         <lote2-gold-docs.json> <salida.json> <docs_h> "<elapsed>"
+         <lote2-gold-docs.json> <salida.json> <docs_h> "<elapsed>" ["<variante>"]
 El fragmento lleva gold por celda (PII): solo se publica dentro del vault cifrado.
 """
 import json
@@ -10,6 +10,7 @@ import sys
 from collections import defaultdict
 
 SRC, AGG_P, DOCS_P, OUT, DOCS_H, ELAPSED = sys.argv[1:7]
+VARIANTE = sys.argv[7] if len(sys.argv) > 7 else ""
 DOCS_H = float(DOCS_H)
 RECS = [json.loads(l) for l in open(SRC)]
 AGG = json.load(open(AGG_P))
@@ -68,7 +69,7 @@ for n, rec in enumerate(sorted(RECS, key=lambda r: str(r.get("doc_id"))), 1):
 
 errores = sum(1 for r in rows if r["estado"] != "listo")
 frag = {
-    "titulo": f"Lote E3V2 · Parte 10 ({len(rows)} frentes, gold_e3)",
+    "titulo": f"Lote E3V2 · Parte 10{' ' + VARIANTE if VARIANTE else ''} ({len(rows)} frentes, gold_e3)",
     "estado": "listo",
     "listo": len(rows) - errores, "jobs": len(rows), "errores": errores, "pct": 100,
     "docs_per_hour": DOCS_H, "meta": 1250, "cumple_meta": DOCS_H >= 1250,
@@ -85,7 +86,8 @@ frag = {
     "gold_eval": gold_eval,
     "rows": rows,
     "nota_kpi": (f"KPI oficial {AGG['conf_real']}% = promedio de conf_real por celda vs gold_e3 "
-                 f"({AGG['gold_docs']} docs, {AGG['comparaciones']} celdas). Pipeline Parte 10 tal cual."),
+                 f"({AGG['gold_docs']} docs, {AGG['comparaciones']} celdas). "
+                 + (f"Pipeline Parte 10 {VARIANTE}." if VARIANTE else "Pipeline Parte 10 tal cual.")),
 }
 json.dump(frag, open(OUT, "w"), ensure_ascii=False)
 print("rows", len(rows), "errores", errores, "kpi", AGG["conf_real"])
