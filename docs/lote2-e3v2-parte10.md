@@ -178,11 +178,40 @@ comunidad_etnia):
 | Los 18 campos de antes | 91,9 % (ruido entre corridas: 91,9–92,6) |
 | docs/h | 854 (una llamada VL más por documento) |
 
-Pendiente: 10 frentes (`6000000108`, `109`, `141`, `153`, `154`, `194`,
-`203`, `237`, `238`, `239`) son una página alta con E-3 + E-4 (2499×3307).
-Todos los recortes están en fracciones de página, así que en esas 10 no caen
-en su caja (6 de los 16 vacíos de comunidad son de ahí). Arreglo propuesto:
-recortar la mitad E-3 antes de procesar.
+10 frentes eran una página alta con E-3 + E-4; se resolvió en la sección
+siguiente.
 
 Visor: menú **Lote E3V2 . Parte 10 + comunidad_etnia**. KPIs sin PII:
 `docs/lote2-comunidad-etnia-gold-kpis.json`.
+
+## Páginas con E-3 + E-4: procesar solo el E-3
+
+10 de los 267 frentes (`6000000108`, `109`, `141`, `153`, `154`, `194`,
+`203`, `237`, `238`, `239`) vienen con el E-4 debajo del E-3 en la misma
+imagen (≈ 2500×3307; un E-3 solo mide ≈ 2500×2211). Todos los recortes están
+en fracciones de página, así que en esas 10 caían en otra caja, y el VL de
+página completa veía dos formularios.
+
+Arreglo: `workers/pagina_e3.py`, llamado por `ocr_worker.py` antes de todo.
+Si alto / ancho > 1,05 (`E3_RATIO_MAX`), se guarda en `/tmp` del contenedor
+solo la parte de arriba con alto = 0,882 × ancho (`E3_ALTO_REL`, mediana de
+los 257 E-3 normales: 0,87–0,91) y todos los lectores usan esa imagen. La
+ruta original sigue en el resultado; el archivo temporal se borra al terminar.
+Las páginas normales no cambian.
+
+| Métrica | Antes | Solo E-3 |
+| --- | ---: | ---: |
+| Esos 10 formularios | 72,2 % | **92,5 %** |
+| KPI oficial (19 campos, 267) | 92,1 % | **93,4 %** |
+| Los 18 campos de antes | 91,9 % | 93,2 % |
+| nivel_estudio | 95,5 % | 98,5 % |
+| tipo_discapacidad | 93,6 % | 95,9 % |
+| comunidad_etnia | 95,3 % | 97,4 % |
+| docs/h | 854 | 879 |
+
+Para lotes nuevos aplica sola: la regla mira la forma de cada imagen, no una
+lista de ids. Supuestos: el E-3 va arriba y la página no viene girada; un
+escaneo de solo E-4, girado o con otro tamaño no lo corrige.
+
+Visor: menú **Lote E3V2 . Parte 10 + comunidad_etnia + solo E-3**. KPIs sin
+PII: `docs/lote2-solo-e3-gold-kpis.json`.

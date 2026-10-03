@@ -1,0 +1,232 @@
+{
+  "lote": "lote2e3",
+  "prefijo": "",
+  "generado": "2026-10-03T00:10:56+00:00",
+  "gold_docs": 267,
+  "jobs": 267,
+  "comparaciones": 5041,
+  "conf_declarada": 89.8,
+  "conf_real": 93.4,
+  "exacto_pct": 83.7,
+  "brecha": -3.6,
+  "veredictos": {
+    "exacto": 4219,
+    "distinto": 366,
+    "casi": 367,
+    "sobra_modelo": 19,
+    "vacio_modelo": 70
+  },
+  "falsos_100": 214,
+  "umbral_casi": 85,
+  "campos": [
+    {
+      "etiqueta": "formulario_no",
+      "n": 267,
+      "exacto": 99.6,
+      "casi": 0.0,
+      "malo": 0.4,
+      "conf_declarada": 91.7,
+      "conf_real": 99.6,
+      "brecha": -7.9,
+      "estricto": true
+    },
+    {
+      "etiqueta": "fecha_inscripcion",
+      "n": 267,
+      "exacto": 93.6,
+      "casi": 0.0,
+      "malo": 6.4,
+      "conf_declarada": 95.0,
+      "conf_real": 93.6,
+      "brecha": 1.4,
+      "estricto": true
+    },
+    {
+      "etiqueta": "tipo_documento",
+      "n": 267,
+      "exacto": 100.0,
+      "casi": 0.0,
+      "malo": 0.0,
+      "conf_declarada": 94.9,
+      "conf_real": 100.0,
+      "brecha": -5.1,
+      "estricto": true
+    },
+    {
+      "etiqueta": "numero_documento",
+      "n": 267,
+      "exacto": 86.9,
+      "casi": 0.0,
+      "malo": 13.1,
+      "conf_declarada": 100.0,
+      "conf_real": 86.9,
+      "brecha": 13.1,
+      "estricto": true
+    },
+    {
+      "etiqueta": "fecha_expedicion",
+      "n": 266,
+      "exacto": 92.5,
+      "casi": 0.0,
+      "malo": 7.5,
+      "conf_declarada": 94.5,
+      "conf_real": 92.5,
+      "brecha": 2.0,
+      "estricto": true
+    },
+    {
+      "etiqueta": "primer_apellido",
+      "n": 267,
+      "exacto": 80.9,
+      "casi": 5.6,
+      "malo": 13.5,
+      "conf_declarada": 98.6,
+      "conf_real": 94.7,
+      "brecha": 3.9,
+      "estricto": false
+    },
+    {
+      "etiqueta": "segundo_apellido",
+      "n": 267,
+      "exacto": 81.6,
+      "casi": 4.5,
+      "malo": 13.9,
+      "conf_declarada": 95.2,
+      "conf_real": 94.3,
+      "brecha": 0.9,
+      "estricto": false
+    },
+    {
+      "etiqueta": "primer_nombre",
+      "n": 267,
+      "exacto": 85.4,
+      "casi": 3.7,
+      "malo": 10.9,
+      "conf_declarada": 99.0,
+      "conf_real": 95.9,
+      "brecha": 3.1,
+      "estricto": false
+    },
+    {
+      "etiqueta": "segundo_nombre",
+      "n": 267,
+      "exacto": 85.4,
+      "casi": 4.5,
+      "malo": 10.1,
+      "conf_declarada": 81.9,
+      "conf_real": 95.7,
+      "brecha": -13.8,
+      "estricto": false
+    },
+    {
+      "etiqueta": "nivel_estudio",
+      "n": 267,
+      "exacto": 98.5,
+      "casi": 0.0,
+      "malo": 1.5,
+      "conf_declarada": 94.2,
+      "conf_real": 98.5,
+      "brecha": -4.3,
+      "estricto": true
+    },
+    {
+      "etiqueta": "email",
+      "n": 266,
+      "exacto": 42.5,
+      "casi": 51.1,
+      "malo": 6.4,
+      "conf_declarada": 95.2,
+      "conf_real": 94.0,
+      "brecha": 1.2,
+      "estricto": false
+    },
+    {
+      "etiqueta": "telefono_movil",
+      "n": 267,
+      "exacto": 76.0,
+      "casi": 0.0,
+      "malo": 24.0,
+      "conf_declarada": 80.8,
+      "conf_real": 76.0,
+      "brecha": 4.8,
+      "estricto": true
+    },
+    {
+      "etiqueta": "telefono_fijo",
+      "n": 237,
+      "exacto": 89.0,
+      "casi": 0.0,
+      "malo": 11.0,
+      "conf_declarada": 21.1,
+      "conf_real": 89.0,
+      "brecha": -67.9,
+      "estricto": true
+    },
+    {
+      "etiqueta": "ciudad",
+      "n": 267,
+      "exacto": 91.4,
+      "casi": 0.7,
+      "malo": 7.9,
+      "conf_declarada": 97.6,
+      "conf_real": 97.4,
+      "brecha": 0.2,
+      "estricto": false
+    },
+    {
+      "etiqueta": "direccion",
+      "n": 267,
+      "exacto": 16.9,
+      "casi": 64.4,
+      "malo": 18.7,
+      "conf_declarada": 93.8,
+      "conf_real": 90.7,
+      "brecha": 3.1,
+      "estricto": false
+    },
+    {
+      "etiqueta": "lee_braille",
+      "n": 267,
+      "exacto": 92.1,
+      "casi": 0.0,
+      "malo": 7.9,
+      "conf_declarada": 94.7,
+      "conf_real": 92.1,
+      "brecha": 2.6,
+      "estricto": true
+    },
+    {
+      "etiqueta": "tipo_discapacidad",
+      "n": 267,
+      "exacto": 95.9,
+      "casi": 0.0,
+      "malo": 4.1,
+      "conf_declarada": 91.1,
+      "conf_real": 95.9,
+      "brecha": -4.8,
+      "estricto": true
+    },
+    {
+      "etiqueta": "etnia",
+      "n": 267,
+      "exacto": 90.3,
+      "casi": 0.0,
+      "malo": 9.7,
+      "conf_declarada": 90.8,
+      "conf_real": 90.3,
+      "brecha": 0.5,
+      "estricto": true
+    },
+    {
+      "etiqueta": "comunidad_etnia",
+      "n": 267,
+      "exacto": 92.1,
+      "casi": 3.0,
+      "malo": 4.9,
+      "conf_declarada": 87.6,
+      "conf_real": 97.4,
+      "brecha": -9.8,
+      "estricto": false
+    }
+  ]
+}
