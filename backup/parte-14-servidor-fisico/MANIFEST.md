@@ -1,9 +1,9 @@
 # MANIFEST Parte 14
 
 8d6963c0c11929154dc0525a8321ecb2  ./docker-compose.yml
-6f1f534137801f28e1d4240640fdcdc7  ./IMPLEMENTACION.md
-6a9a995305daa1cf9a52507e6302d4d1  ./kpis/lote2-parte14-gold-kpis.json
-cfa6c369add565c83387dac20313dfbf  ./LEEME.md
+c67371a1baf43c03511fd8f29494d312  ./IMPLEMENTACION.md
+ff1ed4cf86a695fc9c6044b17a3564b8  ./kpis/lote2-parte14-gold-kpis.json
+907c93d6d2c16ddf786d4adf3179c300  ./LEEME.md
 f125df62f69158815beedbdce7f7eb9b  ./scripts/calibracion/alto.py
 7422b86da1dbc069dc6e5f1c57ea9451  ./scripts/calibracion/conf.py
 470ab8c01764ef2b99754275948b24e7  ./scripts/calibracion/crop41.py
@@ -16,6 +16,9 @@ b7d56c00083c63172b94994843035fc5  ./scripts/calibracion/crops.py
 892cbc5d9cbd4453f4e745ee28b321f0  ./scripts/calibracion/tcom3.py
 2e168d425dc4b6f3965c64c07465c01d  ./scripts/calibracion/tcom.py
 d931c53e61d349090ef6f2bdc6f9cbc8  ./scripts/calibracion/tdir.py
+a9d704ee9d1b90c663cfe3ab87c1dc01  ./scripts/calibracion/tfunc2.py
+443f3a481ce8e1afed6728c2cd9eda37  ./scripts/calibracion/tfunc3.py
+c181fa111b724ad89c592b1b71cddb82  ./scripts/calibracion/tfunc4.py
 0d4ff54930044398f5663d95f0188a87  ./scripts/calibracion/tfunc.py
 d6301649f45ae71979a8dbcf1993cd3b  ./scripts/calibracion/tspot.py
 0aed178b2d5795b5e8c58731c6b0d39d  ./scripts/calibracion/vnorm.py
@@ -37,7 +40,7 @@ cf2db5ed8296ec93ab9def580b745656  ./workers/casillas_vision.py
 cb5fa7b371c878a083f832fd487225f7  ./workers/contacto_vision.py
 d2202dc7e84f8fdb1e36366b4d7ed477  ./workers/digitos_vision.py
 b4a9425aea5a7ed1e40d82d68685ba96  ./workers/direccion_vision.py
-4aedc262648da1ab2c0cade43217a52a  ./workers/funcionario_vision.py
+9700cf0cf61cd7d10b075a74fbae6ef1  ./workers/funcionario_vision.py
 2f0df44586cdf7cbaca1f6068347a1bc  ./workers/nlp_worker.py
 9a8a4d57cf29a8ba7f17ca2b363bd303  ./workers/ocr_worker.py
 37faea829d3035b34429a681f12e4d30  ./workers/pagina_e3.py
