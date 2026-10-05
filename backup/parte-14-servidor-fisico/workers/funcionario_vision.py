@@ -29,21 +29,20 @@ REGIONES = {
         float(os.getenv("FUNC_NOM_Y1", "0.995")),
     ),
 }
-ESCALA = int(os.getenv("FUNC_ESCALA", "2"))
+# Medido contra gold_e3 (267): cédula exacta 66 % a escala 2, 51 % a 3, 74 % a 1.
+ESCALA = int(os.getenv("FUNC_ESCALA", "1"))
 
 _PROMPT = {
-    "funcionario_cedula": """Imagen: recorte del pie de un formulario E3
-colombiano, sección "INFORMACIÓN DEL FUNCIONARIO ELECTORAL". Hay una fila de
-cuadritos con la etiqueta impresa "CÉDULA".
+    "funcionario_cedula": """Imagen: recorte del pie de un formulario E3 colombiano. A la derecha de
+la etiqueta impresa "CÉDULA" hay una fila de cuadritos; en cada cuadrito hay
+a lo sumo UN dígito escrito a mano.
 
-Lee DÍGITO POR DÍGITO, de izquierda a derecha, lo escrito a mano en los
-cuadritos de CÉDULA.
-- Responde SOLO dígitos, sin espacios ni puntos.
-- Casillas vacías al final: no inventes ceros.
-- Ojo: 0/O, 1/l, 5/S, 6/8, 7 con raya.
-- Si todos los cuadritos están vacíos responde exactamente: VACIO
-
-Respuesta: solo dígitos (o VACIO).
+Recorre los cuadritos de izquierda a derecha y escribe el dígito de cada
+cuadrito que tenga tinta, sin saltarte ninguno (también los 1 delgados y los
+dígitos repetidos seguidos, como 11 o 00).
+- Responde SOLO los dígitos, sin espacios ni puntos.
+- Cuadritos vacíos al final: no inventes ceros.
+- Si todos están vacíos responde exactamente: VACIO
 """,
     "funcionario_nombre": """Imagen: recorte del pie de un formulario E3
 colombiano, sección "INFORMACIÓN DEL FUNCIONARIO ELECTORAL". Hay una caja con
