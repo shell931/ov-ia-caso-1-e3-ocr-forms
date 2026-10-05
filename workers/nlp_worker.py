@@ -14,6 +14,7 @@ from postprocess_express import postprocesar_campos_express
 from casillas_vision import aplicar as aplicar_casillas
 from direccion_vision import aplicar_direccion
 from comunidad_vision import aplicar_comunidad
+from funcionario_vision import aplicar_funcionario
 from primer_apellido_vision import aplicar_primer_apellido
 from contacto_vision import aplicar_contacto
 from digitos_vision import aplicar_digitos
@@ -140,6 +141,9 @@ def procesar_nlp(data):
 
         if 'comunidad_vision' in data:
             campos = aplicar_comunidad(campos, data.get('comunidad_vision'))
+
+        if 'funcionario_vision' in data:
+            campos = aplicar_funcionario(campos, data.get('funcionario_vision'))
 
         # Segunda lectura solo de primer_apellido. No modifica otros campos.
         campos = aplicar_primer_apellido(campos, data.get('primer_apellido_vision'))

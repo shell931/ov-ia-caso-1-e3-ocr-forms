@@ -12,6 +12,7 @@ from openai import OpenAI
 from casillas_vision import leer_casillas
 from direccion_vision import leer_direccion
 from comunidad_vision import leer_comunidad
+from funcionario_vision import leer_funcionario
 from pagina_e3 import normalizar as normalizar_pagina
 from contacto_vision import leer_contacto
 from primer_apellido_vision import leer_primer_apellido
@@ -91,6 +92,9 @@ LEER_DIRECCION = os.getenv('LEER_DIRECCION', '1') == '1'
 
 # Caja manuscrita A QUE COMUNIDAD DE LA ETNIA PERTENECE. Ver comunidad_vision.
 LEER_COMUNIDAD = os.getenv('LEER_COMUNIDAD', '1') == '1'
+
+# Pie INFORMACIÓN DEL FUNCIONARIO ELECTORAL (cédula + nombre). Ver funcionario_vision.
+LEER_FUNCIONARIO = os.getenv('LEER_FUNCIONARIO', '1') == '1'
 
 # Lectura focalizada de CORREO / TELEFONOS (recorte ampliado). Ver contacto_vision.
 # OFF por defecto: sim offline vs gold Parte 8 mostro que Qwen2.5-VL-7B en el
@@ -217,6 +221,12 @@ def procesar_ocr_vlm(ruta_imagen):
                 salida['comunidad_vision'] = leer_comunidad(ruta_imagen, client_vl, VL_MODEL)
             except Exception as e:
                 logger.warning(f"lectura de comunidad fallo: {e}")
+
+        if LEER_FUNCIONARIO:
+            try:
+                salida['funcionario_vision'] = leer_funcionario(ruta_imagen, client_vl, VL_MODEL)
+            except Exception as e:
+                logger.warning(f"lectura de funcionario fallo: {e}")
 
         if LEER_APELLIDO:
             try:

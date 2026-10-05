@@ -45,6 +45,8 @@ CAMPOS = (
     "tipo_discapacidad",
     "etnia",
     "comunidad_etnia",
+    "funcionario_cedula",
+    "funcionario_nombre",
 )
 
 # Un solo carácter de diferencia en estos campos ya invalida el dato.
@@ -60,6 +62,7 @@ ESTRICTOS = {
     "lee_braille",
     "tipo_discapacidad",
     "etnia",
+    "funcionario_cedula",
 }
 
 CASI = 85  # similitud mínima para considerar el valor recuperable
@@ -102,7 +105,8 @@ def comparar(gold: dict, preds: list) -> list:
         got = {c["etiqueta"]: c for c in row.get("campos") or []}
         for campo in CAMPOS:
             c = got.get(campo)
-            if c is None:
+            # Golds viejos sin la columna: no se cuenta como error del modelo.
+            if c is None or campo not in g:
                 continue
             pred_raw = str(c.get("valor") or "").strip()
             gold_raw = str(g.get(campo) or "").strip()
