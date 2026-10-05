@@ -215,3 +215,42 @@ escaneo de solo E-4, girado o con otro tamaño no lo corrige.
 
 Visor: menú **Lote E3V2 . Parte 10 + comunidad_etnia + solo E-3**. KPIs sin
 PII: `docs/lote2-solo-e3-gold-kpis.json`.
+
+## Dirección: no agregar complementos que no están escritos
+
+Caso `6000000075`: escrito `CRA 105B N 16F-49`; salió `Cra 105B apto 165-2449`.
+El "Nº" manuscrito (una N con la o pegada) el VL lo leyó como "apto": completa
+con lo típico de una dirección, y el prompt le daba "Apto" de ejemplo. La
+misma imagen con `temperature=0` dio dos lecturas distintas en llamadas
+seguidas. El pipeline además prefería la lectura del recorte por tener "más"
+palabras.
+
+Cambios en `workers/direccion_vision.py`:
+
+1. Prompt sin el ejemplo "(Torre, Apto, Etapa…)" y con "NO agregues palabras
+   que no estén escritas".
+2. Si el recorte trae un complemento (apto, lote, torre, casa, interior,
+   bloque, manzana, piso…) que la lectura de página no tiene, se conserva la
+   de página.
+3. Segunda lectura del recorte (`DIR_DOBLE=1`, temperatura 0,3). Si no
+   coincide con la primera, la dirección queda con confianza 60 y
+   `revisar: true` (guarda `segunda_lectura` y `valor_nlp`).
+
+| Métrica (267) | Antes | Ahora |
+| --- | ---: | ---: |
+| Direcciones con complemento inventado | 3 | **0** |
+| direccion conf_real | 90,7 % | 90,4 % (ruido) |
+| direccion confianza declarada | 93,8 % | 86,8 % (más honesta) |
+| Direcciones marcadas `revisar` | — | 55 (solo 5 exactas) |
+| KPI oficial (19 campos) | 93,4 % | 93,2 % (ruido) |
+| docs/h | 879 | 871 |
+
+Antes de elegir el prompt se midieron variantes solo sobre la lectura del
+recorte en los 267: reescribir el prompt entero bajaba el exacto; quitar
+solo los ejemplos dejó la similitud igual (85,7 vs 85,4–85,8 % del actual en
+dos corridas) y bajó los complementos inventados de 3 a 0 (`6000000211`
+"Apt 503" sí está escrito).
+
+Esto no arregla dígitos mal leídos: `6000000075` ahora sale
+`Cra 105B No. 16-24-149`, sin "apto" pero con números mal, y queda marcado
+para revisar. KPIs sin PII: `docs/lote2-direccion-gold-kpis.json`.
