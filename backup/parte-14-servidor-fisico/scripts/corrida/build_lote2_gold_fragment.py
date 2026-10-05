@@ -52,6 +52,8 @@ for n, rec in enumerate(sorted(RECS, key=lambda r: str(r.get("doc_id"))), 1):
     for c in rec.get("campos", []):
         campo = {"etiqueta": c.get("etiqueta"), "valor": c.get("valor", ""),
                  "confianza": c.get("confianza", 0)}
+        if c.get("revisar"):
+            campo.update(revisar=True, segunda_lectura=c.get("segunda_lectura", ""))
         g = goldd.get(c.get("etiqueta"))
         if g:
             campo.update(conf_real=g.get("conf_real"), veredicto=g.get("veredicto"),

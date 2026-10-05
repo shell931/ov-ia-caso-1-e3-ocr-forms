@@ -11,12 +11,12 @@ hay otro set de 256; el nombre del menú es el pedido).
 
 | Métrica | Parte 10 + dirección (anterior) | Parte 14 |
 | --- | ---: | ---: |
-| KPI oficial vs gold (21 campos) | — | **92,5 %** |
-| Los 19 campos de antes | 93,2 % | 93,4 % |
-| funcionario_cedula (exacta, estricto) | — | 74,5 % |
-| funcionario_nombre (similitud) | — | 92,7 % |
-| numero_documento | 86,9 % | 87,3 % |
-| docs/h (meta 1250) | 871 | 860 |
+| KPI oficial vs gold (21 campos) | — | **92,4 %** |
+| Los 19 campos de antes | 93,2 % | 93,3 % |
+| funcionario_cedula (exacta, estricto) | — | 73,8 % |
+| funcionario_nombre (similitud) | — | 92,5 % |
+| Nombres marcados `revisar` | — | 37 (31 mal) |
+| docs/h (meta 1250) | 871 | 852 |
 
 Visor: https://shell931.github.io/e3-pages/ — menú
 **Lote E3V2 . Parte 14 (analisis 256 formularios)** (clave `lote2p14`).
@@ -39,7 +39,7 @@ anterior). El CSV y el JSON tienen PII: solo en el servidor, nunca en git.
 ```bash
 python3 scripts/corrida/gold_csv_to_json.py gold_e3.csv /data/e3/gold/gold_lote2.json
 python3 scripts/corrida/compare_gold_real.py /data/e3/gold/gold_lote2.json \
-    /data/e3/preds_lote2p14b.json "" lote2p14b
+    /data/e3/preds_lote2p14c.json "" lote2p14c
 ```
 
 Con el gold se recalibró la cédula: la primera corrida (escala 2) daba
@@ -47,6 +47,11 @@ Con el gold se recalibró la cédula: la primera corrida (escala 2) daba
 un prompt que recorre cuadrito por cuadrito sube a 74,5 % sin llamadas
 extra (`scripts/calibracion/tfunc2.py`–`tfunc4.py`, tabla en
 `docs/lote2-e3v2-parte14.md`). Ampliar más empeora.
+
+El nombre se lee dos veces: la segunda pide letra por letra aunque no
+parezca un nombre real (el VL tiende a completar con nombres frecuentes,
+caso `6000000306` "Luz" → "José"). Si difieren (similitud < 90) el nombre
+queda con confianza 60 y `revisar` (`tnom*.py`).
 
 ## Flujo (diagrama)
 
@@ -90,6 +95,7 @@ flowchart TB
 | `LEER_FUNCIONARIO` | `1` (default) | Lee cédula y nombre del funcionario |
 | `FUNC_CED_X0/Y0/X1/Y1` | `0.04 / 0.925 / 0.52 / 0.995` | Recorte CÉDULA |
 | `FUNC_NOM_X0/Y0/X1/Y1` | `0.50 / 0.925 / 0.99 / 0.995` | Recorte NOMBRE |
+| `FUNC_NOM_DOBLE` / `FUNC_NOM_UMBRAL` | `1` / `90` | Segunda lectura del nombre y umbral para marcar revisar |
 | `FUNC_ESCALA` | `1` | Escala del recorte (2: 66 %, 3: 51 % en cédula) |
 | `LEER_COMUNIDAD` / `DIR_DOBLE` | `1` | Igual que el lote anterior |
 | `CASILLAS_PIE_BLANCO_X` | `0.73` | Tapa la caja de comunidad en casillas |
@@ -105,7 +111,7 @@ flowchart TB
 | `docker-compose.yml` | Compose del servidor (rabbitmq, vllm-vl, vllm-nlp, ocr, nlp) |
 | `workers/` | Los 12 archivos de `/app` tal cual corrieron (incluye `funcionario_vision.py`) |
 | `scripts/corrida/` | `run_lote2.sh`, `l2_enqueue.py`, `l2_consume.py`, `preds_lote2.py`, `gold_csv_to_json.py`, `compare_gold_real.py`, `build_lote2_gold_fragment.py`, `add_fragment.py` (+ versiones `enqueue_lote2.py` / `consume_lote2.py` del repo) |
-| `scripts/calibracion/` | Pruebas de recortes y prompts de todo el lote E3V2: `tfunc.py`–`tfunc4.py` / `tspot.py` (funcionario), `tcom*.py` (comunidad), `tdir.py` / `dirstats.py` (dirección), `alto.py` / `vnorm.py` (páginas E-3+E-4), `crop*.py`, `conf.py`, `diff.py`, `sub.py` |
+| `scripts/calibracion/` | Pruebas de recortes y prompts de todo el lote E3V2: `tfunc.py`–`tfunc4.py` / `tspot.py` / `tnom*.py` (funcionario), `tcom*.py` (comunidad), `tdir.py` / `dirstats.py` (dirección), `alto.py` / `vnorm.py` (páginas E-3+E-4), `crop*.py`, `conf.py`, `diff.py`, `sub.py` |
 | `scripts/visor/` | Chequeo del visor con Playwright (`E3_VAULT_USER` / `E3_VAULT_PASS` por entorno) |
 | `kpis/` | `lote2-parte14-gold-kpis.json`: agregado por campo (21 campos) **sin PII** |
 

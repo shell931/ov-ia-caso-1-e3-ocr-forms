@@ -18,6 +18,9 @@ el gold y publicar la corrida completa en el visor.
   - `funcionario_nombre`: x 0,50–0,99 · y 0,925–0,995, escala 1. Prompt de
     transcripción literal, sin corregir ni completar.
 - `temperature=0`, VL 7B de la página (GPU0).
+- Nombre con segunda lectura (`FUNC_NOM_DOBLE=1`): prompt letra por letra,
+  temperatura 0. Si la similitud con la primera es < `FUNC_NOM_UMBRAL` (90),
+  `estable: false` → confianza 60, `revisar: true`, `segunda_lectura`.
 - `aplicar_funcionario()` agrega los dos campos con `fuente:
   funcionario_visual`, confianza 90 con valor / 85 vacío con lectura / 0 sin
   lectura (misma convención que `comunidad_vision`).
@@ -25,7 +28,7 @@ el gold y publicar la corrida completa en el visor.
 ### `workers/ocr_worker.py`
 
 - `LEER_FUNCIONARIO` (default `1`) → `salida['funcionario_vision']`.
-- Dos llamadas VL más por formulario: 871 → 860 docs/h.
+- Tres llamadas VL más por formulario (cédula, nombre, segunda lectura del nombre): 871 → 852 docs/h.
 
 ### `workers/nlp_worker.py`
 
@@ -63,6 +66,9 @@ el gold y publicar la corrida completa en el visor.
 
 Nombre: escala 2 92,0 % · escala 1 92,7 %.
 
+Segunda lectura del nombre (`tnom2.py` / `tnom3.py`): ninguna variante
+acierta más que la primera; letra por letra con umbral 90 marca 36, 31 mal.
+
 ## Cómo repetir
 
 ```bash
@@ -71,27 +77,28 @@ scp workers/*.py ubuntu@18.188.49.114:test-ia-local/caso-1-v2-e3/workers/
 docker restart caso1v2e3e3-ocr caso1v2e3e3-nlp
 docker cp scripts/corrida/l2_enqueue.py caso1v2e3e3-ocr:/tmp/
 docker cp scripts/corrida/l2_consume.py caso1v2e3e3-ocr:/tmp/
-bash scripts/corrida/run_lote2.sh /data/e3/resultados_lote2_parte14b.jsonl /tmp/lote2_p14b.log
+bash scripts/corrida/run_lote2.sh /data/e3/resultados_lote2_parte14c.jsonl /tmp/lote2_p14c.log
 
 cd /data/e3
-python3 preds_lote2.py resultados_lote2_parte14b.jsonl preds_lote2p14b.json
-python3 compare_gold_real.py gold/gold_lote2.json preds_lote2p14b.json "" lote2p14b
-python3 build_lote2_gold_fragment.py resultados_lote2_parte14b.jsonl lote2p14b-gold.json \
-    lote2p14b-gold-docs.json lote2_p14b_vault_fragment.json 859.7 "18 min 38 s" \
+python3 preds_lote2.py resultados_lote2_parte14c.jsonl preds_lote2p14c.json
+python3 compare_gold_real.py gold/gold_lote2.json preds_lote2p14c.json "" lote2p14c
+python3 build_lote2_gold_fragment.py resultados_lote2_parte14c.jsonl lote2p14c-gold.json \
+    lote2p14c-gold-docs.json lote2_p14c_vault_fragment.json 852.1 "18 min 48 s" \
     "<nota>" "Lote E3V2 . Parte 14 (analisis 256 formularios)"
 
-# repo e3-pages: SPECS.lote2p14 + PARTE_KEYS + vault.json?v=lote2p14b
+# repo e3-pages: SPECS.lote2p14 + PARTE_KEYS + vault.json?v=lote2p14c
 python3 add_fragment.py "$E3_VAULT_USER" "$E3_VAULT_PASS" data/vault.json \
-    lote2_p14b_vault_fragment.json lote2p14
+    lote2_p14c_vault_fragment.json lote2p14
 ```
 
 ## Resultado
 
 | Campo / KPI | Valor |
 | --- | --- |
-| KPI oficial (21 campos, 5566 celdas) | 92,5 % |
-| Los 19 campos de antes | 93,4 % |
-| funcionario_cedula | 74,5 % exacta |
-| funcionario_nombre | 92,7 % (51,7 % exacto + 30,7 % casi) |
-| docs/h · tiempo | 860 · 18 min 38 s |
-| Errores OCR/NLP | 0 (6000000079 reprocesado: JSON cortado del NLP) |
+| KPI oficial (21 campos, 5569 celdas) | 92,4 % |
+| Los 19 campos de antes | 93,3 % |
+| funcionario_cedula | 73,8 % exacta |
+| funcionario_nombre | 92,5 % (52,1 % exacto + 30,0 % casi) |
+| Nombres revisar | 37 (31 mal; marcados 83,0 % vs resto 94,0 %) |
+| docs/h · tiempo | 852 · 18 min 48 s |
+| Errores OCR/NLP | 0 |

@@ -12,6 +12,7 @@ import io
 import os
 import re
 import unicodedata
+from difflib import SequenceMatcher
 
 from PIL import Image
 
@@ -31,6 +32,15 @@ REGIONES = {
 }
 # Medido contra gold_e3 (267): cédula exacta 66 % a escala 2, 51 % a 3, 74 % a 1.
 ESCALA = int(os.getenv("FUNC_ESCALA", "1"))
+
+# Con letra ambigua el VL completa con un nombre frecuente ("Luz" -> "José").
+# Una segunda lectura pidiendo letras aunque no formen un nombre real no
+# acierta más, pero si difiere mucho de la primera el nombre es dudoso: se
+# conserva la primera, baja a CONF_DUDOSA y queda revisar. Medido contra
+# gold_e3 (267) con umbral 90: marca 36, 31 de ellos mal.
+NOM_DOBLE = os.getenv("FUNC_NOM_DOBLE", "1") == "1"
+NOM_UMBRAL = int(os.getenv("FUNC_NOM_UMBRAL", "90"))
+CONF_DUDOSA = 60
 
 _PROMPT = {
     "funcionario_cedula": """Imagen: recorte del pie de un formulario E3 colombiano. A la derecha de
@@ -54,6 +64,15 @@ Copia el nombre manuscrito tal cual, letra por letra, en una línea.
 - Solo si la caja no tiene ningún trazo de tinta responde: VACIO
 """,
 }
+
+_PROMPT_LETRAS = """Imagen: recorte del pie de un formulario E3 colombiano, caja "NOMBRE"
+(etiqueta impresa, no la copies). A mano está el nombre del funcionario.
+
+Transcribe letra por letra lo que ves escrito, aunque el resultado no parezca
+un nombre real o común. No adivines nombres: si una letra es dudosa, escribe
+la que más se parece a lo trazado. Una sola línea.
+Solo si la caja no tiene ningún trazo de tinta responde: VACIO
+"""
 
 
 def _norm(s: str) -> str:
@@ -99,14 +118,23 @@ def _crop_b64(ruta: str, box: tuple[float, float, float, float]) -> str:
         return base64.b64encode(buf.getvalue()).decode()
 
 
-def _leer_uno(client, modelo: str, ruta: str, campo: str) -> dict:
+def _similitud(a: str, b: str) -> int:
+    a, b = _norm(a), _norm(b)
+    if a == b:
+        return 100
+    if not a or not b:
+        return 0
+    return round(100 * SequenceMatcher(None, a, b).ratio())
+
+
+def _leer_uno(client, modelo: str, ruta: str, campo: str, prompt: str | None = None) -> dict:
     out = {"valor": "", "evidencia": False, "raw": ""}
     try:
         b64 = _crop_b64(ruta, REGIONES[campo])
         r = client.chat.completions.create(
             model=modelo,
             messages=[{"role": "user", "content": [
-                {"type": "text", "text": _PROMPT[campo]},
+                {"type": "text", "text": prompt or _PROMPT[campo]},
                 {"type": "image_url", "image_url": {"url": f"data:image/png;base64,{b64}"}},
             ]}],
             max_tokens=48,
@@ -121,8 +149,18 @@ def _leer_uno(client, modelo: str, ruta: str, campo: str) -> dict:
 
 
 def leer_funcionario(ruta_imagen: str, client, modelo: str) -> dict:
-    """Devuelve {campo: {valor, evidencia, raw}} para cédula y nombre."""
-    return {c: _leer_uno(client, modelo, ruta_imagen, c) for c in REGIONES}
+    """Devuelve {campo: {valor, evidencia, raw}} para cédula y nombre.
+
+    El nombre trae además {segunda, estable} si NOM_DOBLE.
+    """
+    out = {c: _leer_uno(client, modelo, ruta_imagen, c) for c in REGIONES}
+    nom = out["funcionario_nombre"]
+    if NOM_DOBLE and nom["valor"]:
+        segunda = _leer_uno(client, modelo, ruta_imagen, "funcionario_nombre",
+                            _PROMPT_LETRAS)["valor"]
+        nom["segunda"] = segunda
+        nom["estable"] = _similitud(nom["valor"], segunda) >= NOM_UMBRAL
+    return out
 
 
 def aplicar_funcionario(campos: list, lectura: dict | None) -> list:
@@ -133,10 +171,15 @@ def aplicar_funcionario(campos: list, lectura: dict | None) -> list:
         info = lectura.get(campo) or {}
         valor = (info.get("valor") or "").strip()
         confianza = (90 if valor else 85) if info.get("evidencia") else 0
-        campos.append({
+        nuevo = {
             "etiqueta": campo,
             "valor": valor,
             "confianza": confianza,
             "fuente": "funcionario_visual",
-        })
+        }
+        if valor and info.get("estable") is False:
+            nuevo["confianza"] = CONF_DUDOSA
+            nuevo["revisar"] = True
+            nuevo["segunda_lectura"] = info.get("segunda", "")
+        campos.append(nuevo)
     return campos

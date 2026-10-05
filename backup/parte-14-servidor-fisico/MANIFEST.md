@@ -1,9 +1,9 @@
 # MANIFEST Parte 14
 
 8d6963c0c11929154dc0525a8321ecb2  ./docker-compose.yml
-c67371a1baf43c03511fd8f29494d312  ./IMPLEMENTACION.md
-ff1ed4cf86a695fc9c6044b17a3564b8  ./kpis/lote2-parte14-gold-kpis.json
-907c93d6d2c16ddf786d4adf3179c300  ./LEEME.md
+07e9348de1f33d597539adb52c876c61  ./IMPLEMENTACION.md
+7a87813a747af84d8bae83767b774f85  ./kpis/lote2-parte14-gold-kpis.json
+01da1e4a808a1f348cebbbb659d3eabd  ./LEEME.md
 f125df62f69158815beedbdce7f7eb9b  ./scripts/calibracion/alto.py
 7422b86da1dbc069dc6e5f1c57ea9451  ./scripts/calibracion/conf.py
 470ab8c01764ef2b99754275948b24e7  ./scripts/calibracion/crop41.py
@@ -20,11 +20,14 @@ a9d704ee9d1b90c663cfe3ab87c1dc01  ./scripts/calibracion/tfunc2.py
 443f3a481ce8e1afed6728c2cd9eda37  ./scripts/calibracion/tfunc3.py
 c181fa111b724ad89c592b1b71cddb82  ./scripts/calibracion/tfunc4.py
 0d4ff54930044398f5663d95f0188a87  ./scripts/calibracion/tfunc.py
+ebc0f75285f995c87dc63c83a482de5b  ./scripts/calibracion/tnom2.py
+63f773c6ea3dcf41906cf830242a34c7  ./scripts/calibracion/tnom3.py
+740d314f4fc448e376a81b2840962922  ./scripts/calibracion/tnom.py
 d6301649f45ae71979a8dbcf1993cd3b  ./scripts/calibracion/tspot.py
 0aed178b2d5795b5e8c58731c6b0d39d  ./scripts/calibracion/vnorm.py
 15e6f81149801cb245e124ea5070c35b  ./scripts/corrida/add_fragment.py
 23bd77c0af4d9ff984a440c761b80da7  ./scripts/corrida/build_lote2_fragment.py
-9982db3a298fec5cb354a8cddc0b67fb  ./scripts/corrida/build_lote2_gold_fragment.py
+b84cf201564cc06fcb500467a91e33ee  ./scripts/corrida/build_lote2_gold_fragment.py
 1644872c4b084263e2cb46d8d2219e8d  ./scripts/corrida/compare_gold_real.py
 e94bf42aa3a8d006e75ad109d5765efd  ./scripts/corrida/consume_lote2.py
 3651ddd8ef810dcfb341d3af1f18a859  ./scripts/corrida/enqueue_lote2.py
@@ -35,12 +38,13 @@ e94bf42aa3a8d006e75ad109d5765efd  ./scripts/corrida/l2_consume.py
 a1952dc8503dbdc6fe28e8f4f9166afb  ./scripts/corrida/run_lote2.sh
 f9e112a3acc38c6d9c11b0f1da9c4fe7  ./scripts/visor/chk14b.py
 7e3bbfae33177e92a24161d0bbc3f193  ./scripts/visor/chk14.py
+3086311d87f7f60de0cbe19858b68fbd  ./scripts/visor/chk306.py
 cf2db5ed8296ec93ab9def580b745656  ./workers/casillas_vision.py
 59905601653c0cae63b0875c8ddaea56  ./workers/comunidad_vision.py
 cb5fa7b371c878a083f832fd487225f7  ./workers/contacto_vision.py
 d2202dc7e84f8fdb1e36366b4d7ed477  ./workers/digitos_vision.py
 b4a9425aea5a7ed1e40d82d68685ba96  ./workers/direccion_vision.py
-9700cf0cf61cd7d10b075a74fbae6ef1  ./workers/funcionario_vision.py
+e7f4466e0f2274f2ca065b2842a65730  ./workers/funcionario_vision.py
 2f0df44586cdf7cbaca1f6068347a1bc  ./workers/nlp_worker.py
 9a8a4d57cf29a8ba7f17ca2b363bd303  ./workers/ocr_worker.py
 37faea829d3035b34429a681f12e4d30  ./workers/pagina_e3.py
