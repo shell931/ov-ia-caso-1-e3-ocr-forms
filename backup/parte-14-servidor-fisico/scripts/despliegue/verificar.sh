@@ -24,14 +24,15 @@ for port_model in "8001 Qwen/Qwen2.5-VL-7B-Instruct" "8000 Qwen/Qwen2.5-7B-Instr
   else mal ":$1 $2 no responde (si recién arrancó, esperar ~3-5 min)"; fi
 done
 
-echo "== Workers"
-o=$(docker exec $P-ocr sh -c 'ps aux | grep -c "[o]cr_worker.py"' 2>/dev/null || echo 0)
-l=$(docker exec $P-nlp sh -c 'ps aux | grep -c "[n]lp_worker.py"' 2>/dev/null || echo 0)
-[ "$o" = 8 ] && ok "8 OCR" || mal "OCR workers: $o (esperado 8; ver docker logs $P-ocr)"
-[ "$l" = 12 ] && ok "12 NLP" || mal "NLP workers: $l (esperado 12; ver docker logs $P-nlp)"
+echo "== Workers (consumidores en RabbitMQ)"
+colas=$(docker exec $P-rabbitmq rabbitmqctl list_queues name messages consumers 2>/dev/null)
+o=$(echo "$colas" | awk '$1 == "ocr_input" {print $3}')
+l=$(echo "$colas" | awk '$1 == "ocr_output" {print $3}')
+[ "${o:-0}" = 8 ] && ok "8 OCR" || mal "OCR workers: ${o:-0} (esperado 8; ver docker logs $P-ocr)"
+[ "${l:-0}" = 12 ] && ok "12 NLP" || mal "NLP workers: ${l:-0} (esperado 12; ver docker logs $P-nlp)"
 
-echo "== Colas"
-docker exec $P-rabbitmq rabbitmqctl list_queues name messages consumers 2>/dev/null | grep -E "ocr_input|ocr_output|nlp_output" | sed 's/^/  /'
+echo "== Colas (mensajes pendientes)"
+echo "$colas" | awk '$1 ~ /^(ocr_input|ocr_output|nlp_output)$/ {print "  " $1 ": " $2}'
 
 [ $fallas -eq 0 ] && echo "== TODO OK" || echo "== $fallas falla(s)"
 exit $((fallas > 0))

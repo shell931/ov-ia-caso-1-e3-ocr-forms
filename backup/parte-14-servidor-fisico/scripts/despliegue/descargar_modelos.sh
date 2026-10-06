@@ -11,8 +11,9 @@ for spec in \
   "Qwen/Qwen2.5-7B-Instruct-AWQ b25037543e9394b818fdfca67ab2a00ecc7dd641"; do
   set -- $spec
   echo "== $1 @ $2"
-  docker run --rm -e HF_TOKEN="${HF_TOKEN:-}" -e HF_HOME=/root/.cache/huggingface \
-    -v "$HF_HOST":/root/.cache/huggingface --entrypoint hf "$IMG" \
+  docker run --rm --user "$(id -u):$(id -g)" -e HOME=/tmp \
+    -e HF_TOKEN="${HF_TOKEN:-}" -e HF_HOME=/hf \
+    -v "$HF_HOST":/hf --entrypoint hf "$IMG" \
     download "$1" --revision "$2" >/dev/null
   ls "$HF_HOST/hub/models--${1//\//--}/snapshots/$2" >/dev/null && echo "   ok"
 done
