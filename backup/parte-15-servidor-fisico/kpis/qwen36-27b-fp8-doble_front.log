@@ -1,0 +1,21 @@
+=== qwen36-27b-fp8-doble_front 2026-10-06T19:15:53+00:00 N=267
+encolados 267
+esperando 0/267
+recibidos 25/267
+recibidos 50/267
+recibidos 75/267
+recibidos 100/267
+recibidos 125/267
+recibidos 150/267
+recibidos 175/267
+recibidos 200/267
+recibidos 225/267
+recibidos 250/267
+recolectados 267/267 -> /tmp/salida.jsonl
+reintento de 1 doc(s): 6000000044
+encolados 1
+recolectados 1/1 -> /tmp/reintento.jsonl
+listos 267/267 · errores 0 
+campos marcados revisar: 1233
+tiempo 17 min 9 s · 934.1 docs/h
+=== FIN 2026-10-06T19:33:02+00:00 -> /home/ubuntu/e3/p15/res/qwen36-27b-fp8-doble_front.jsonl

@@ -1,0 +1,48 @@
+celdas 5614 · errores 733 · AUC conf_lp 92.0 vs declarada 47.8
+umbral | conf_lp: marcadas atrapa precisión tras-revisar | declarada: marcadas atrapa tras-revisar
+  <10  |      0.0%    0.0%      0.0%      86.9%   |      5.0%    2.2%      87.2%
+  <20  |      0.3%    2.5%     94.7%      87.3%   |      5.0%    2.2%      87.2%
+  <30  |      1.5%   10.0%     86.9%      88.2%   |      5.0%    2.2%      87.2%
+  <40  |      3.5%   22.0%     81.3%      89.8%   |      5.0%    2.2%      87.2%
+  <50  |      6.3%   36.0%     74.4%      91.6%   |      5.4%    2.3%      87.2%
+  <60  |     11.6%   55.7%     62.5%      94.2%   |      5.4%    2.3%      87.2%
+  <70  |     16.5%   70.5%     55.7%      96.2%   |      6.3%    7.8%      88.0%
+  <80  |     21.7%   78.7%     47.5%      97.2%   |      6.5%    8.2%      88.0%
+  <90  |     29.7%   87.6%     38.5%      98.4%   |      8.7%    8.2%      88.0%
+  <95  |     36.5%   91.7%     32.8%      98.9%   |     24.4%   36.0%      91.6%
+
+campo                   n  mal  AUC lp  AUC dec  marcadas/atrapa @30 @50 @70
+ciudad                267    9    62.6     14.1  0.4/11.1  2.2/11.1  18.4/22.2
+comunidad_etnia       267    7    99.0     26.3  0.0/0.0  1.1/28.6  3.7/85.7
+direccion             267  180    65.0     58.5  4.5/6.1  22.5/28.3  69.7/76.7
+email                 267  129    76.5     49.5  8.2/14.7  32.6/49.6  66.7/85.3
+etnia                 267    1    94.5     34.4  0.0/0.0  0.0/0.0  0.4/0.0
+fecha_expedicion      267   10    96.8     49.8  0.0/0.0  0.7/0.0  1.9/10.0
+fecha_inscripcion     267   14    76.3     49.8  0.0/0.0  0.7/7.1  6.7/14.3
+formulario_no         267    0    None     None  0.0/0  0.0/0  0.4/0
+funcionario_cedula    267   30    82.0     50.0  0.0/0.0  1.5/3.3  10.9/26.7
+funcionario_nombre    267   95    86.2     55.2  10.1/25.3  28.8/63.2  50.9/86.3
+lee_braille           267    1    98.1     46.6  0.0/0.0  0.0/0.0  1.1/0.0
+nivel_estudio         271    4    71.6     12.3  0.0/0.0  0.0/0.0  0.4/0.0
+numero_documento      267   27    91.1     51.9  0.0/0.0  0.7/7.4  8.2/63.0
+primer_apellido       267   49    82.6     54.0  2.2/8.2  13.5/44.9  27.3/63.3
+primer_nombre         267   38    90.7     46.7  2.6/18.4  8.6/50.0  21.0/76.3
+segundo_apellido      267   39    92.0     55.6  1.9/12.8  9.0/48.7  22.1/79.5
+segundo_nombre        267   33    88.7     44.3  1.5/6.1  7.9/42.4  20.6/75.8
+telefono_fijo         270   13    93.3     42.4  0.0/0.0  0.0/0.0  2.2/23.1
+telefono_movil        267   53    90.5     50.4  0.0/0.0  3.0/15.1  15.4/60.4
+tipo_discapacidad     267    1    99.1     99.2  0.0/0.0  0.0/0.0  0.0/0.0
+tipo_documento        267    0    None     None  0.0/0  0.0/0  0.0/0
+
+Política final (campo revisar): {'marcadas_pct': 21.9, 'errores_atrapados_pct': 79.0, 'exactitud_sin_revisar_pct': 86.9, 'exactitud_tras_revision_pct': 97.3}
+
+Umbrales por campo (ajustados en la mitad A, medidos en la mitad B):
+  objetivo 60%: B -> {'marcadas_pct': 25.7, 'errores_atrapados_pct': 67.2, 'exactitud_sin_revisar_pct': 87.0, 'exactitud_tras_revision_pct': 95.7}
+     LP_UMBRALES=ciudad=85,comunidad_etnia=55,direccion=65,email=60,etnia=100,fecha_expedicion=85,fecha_inscripcion=100,formulario_no=0,funcionario_cedula=85,funcionario_nombre=55,lee_braille=0,nivel_estudio=101,numero_documento=70,primer_apellido=65,primer_nombre=70,segundo_apellido=50,segundo_nombre=60,telefono_fijo=101,telefono_movil=75,tipo_discapacidad=90,tipo_documento=0
+  objetivo 70%: B -> {'marcadas_pct': 29.4, 'errores_atrapados_pct': 73.3, 'exactitud_sin_revisar_pct': 87.0, 'exactitud_tras_revision_pct': 96.5}
+     LP_UMBRALES=ciudad=95,comunidad_etnia=55,direccion=70,email=60,etnia=100,fecha_expedicion=95,fecha_inscripcion=100,formulario_no=0,funcionario_cedula=85,funcionario_nombre=55,lee_braille=0,nivel_estudio=101,numero_documento=80,primer_apellido=85,primer_nombre=75,segundo_apellido=60,segundo_nombre=70,telefono_fijo=101,telefono_movil=85,tipo_discapacidad=90,tipo_documento=0
+  objetivo 80%: B -> {'marcadas_pct': 34.5, 'errores_atrapados_pct': 79.3, 'exactitud_sin_revisar_pct': 87.0, 'exactitud_tras_revision_pct': 97.3}
+     LP_UMBRALES=ciudad=95,comunidad_etnia=55,direccion=75,email=70,etnia=100,fecha_expedicion=95,fecha_inscripcion=101,formulario_no=0,funcionario_cedula=95,funcionario_nombre=60,lee_braille=0,nivel_estudio=101,numero_documento=85,primer_apellido=90,primer_nombre=75,segundo_apellido=65,segundo_nombre=100,telefono_fijo=101,telefono_movil=90,tipo_discapacidad=90,tipo_documento=0
+  objetivo 90%: B -> {'marcadas_pct': 52.1, 'errores_atrapados_pct': 90.1, 'exactitud_sin_revisar_pct': 87.0, 'exactitud_tras_revision_pct': 98.7}
+     LP_UMBRALES=ciudad=100,comunidad_etnia=55,direccion=95,email=85,etnia=100,fecha_expedicion=101,fecha_inscripcion=101,formulario_no=0,funcionario_cedula=100,funcionario_nombre=70,lee_braille=0,nivel_estudio=101,numero_documento=90,primer_apellido=100,primer_nombre=100,segundo_apellido=80,segundo_nombre=100,telefono_fijo=101,telefono_movil=100,tipo_discapacidad=90,tipo_documento=0
+-> /home/ubuntu/e3/p15/res/qwen36-27b-fp8-doble_front.lp.json

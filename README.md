@@ -13,10 +13,12 @@ Extraer campos estructurados de formularios E3/E4 escaneados con **≥80% de con
 
 | Métrica | Valor |
 |---------|-------|
-| **Confianza Real** | ≥80% (antes: 72.6%) |
-| **Throughput** | ~1,700 docs/h |
-| **Latency (p95)** | ~3.5s/doc |
-| **Hardware** | 2× RTX PRO 6000 Ada (96 GB VRAM c/u) |
+| **KPI oficial (Parte 15)** | **95,7 %** conf_real vs gold (267 docs, 21 campos) |
+| **Baseline Parte 14** | 92,4 % (Qwen2.5-VL-7B) |
+| **Throughput Parte 15** | ~934 docs/h (Qwen3.6-27B-FP8 dual) |
+| **Hardware** | 2× RTX PRO 6000 Blackwell (96 GB VRAM c/u) |
+
+Detalle: [`docs/lote2-e3v2-parte15.md`](docs/lote2-e3v2-parte15.md). Visor: https://shell931.github.io/e3-pages/
 
 ## 🚀 Deploy Rápido
 

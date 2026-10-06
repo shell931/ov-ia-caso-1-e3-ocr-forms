@@ -1,0 +1,33 @@
+qwen36-27b-fp8-doble_front: 267 jobs · 5607 comparaciones
+
+campo                    n  exacto   casi   malo  conf.dec  conf.real  brecha
+-----------------------------------------------------------------------------
+formulario_no          267  100.0%   0.0%   0.0%    100.0%     100.0%   +0.0
+fecha_inscripcion      267   94.8%   0.0%   5.2%     95.0%      94.8%   +0.2
+tipo_documento         267  100.0%   0.0%   0.0%     94.9%     100.0%   -5.1
+numero_documento       267   89.9%   0.0%  10.1%    100.0%      89.9%  +10.1
+fecha_expedicion       267   96.3%   0.0%   3.7%     95.0%      96.3%   -1.3
+primer_apellido        267   81.6%   5.6%  12.7%     98.7%      95.1%   +3.6
+segundo_apellido       267   85.4%   3.4%  11.2%     95.6%      95.4%   +0.2
+primer_nombre          267   85.8%   3.4%  10.9%     98.7%      95.4%   +3.3
+segundo_nombre         267   87.6%   4.1%   8.2%     81.7%      96.4%  -14.7
+nivel_estudio          267   99.6%   0.0%   0.4%     94.5%      99.6%   -5.1
+email                  267   51.7%  43.1%   5.2%     96.1%      95.8%   +0.3
+telefono_movil         267   80.1%   0.0%  19.9%     96.5%      80.1%  +16.4
+telefono_fijo          267   95.1%   0.0%   4.9%     24.0%      95.1%  -71.1
+ciudad                 267   96.6%   0.0%   3.4%     95.8%      98.9%   -3.1
+direccion              267   32.6%  57.7%   9.7%     89.4%      94.3%   -4.9
+lee_braille            267   99.6%   0.0%   0.4%     93.7%      99.6%   -5.9
+tipo_discapacidad      267   99.6%   0.0%   0.4%     93.9%      99.6%   -5.7
+etnia                  267   99.6%   0.0%   0.4%     91.2%      99.6%   -8.4
+comunidad_etnia        267   97.4%   1.1%   1.5%     87.7%      99.4%  -11.7
+funcionario_cedula     267   88.8%   0.0%  11.2%     90.0%      88.8%   +1.2
+funcionario_nombre     267   64.4%  24.3%  11.2%     88.5%      94.7%   -6.2
+-----------------------------------------------------------------------------
+TOTAL                 5607   95.7%                   90.5%      95.7%   -5.2
+
+Declarados 100% y distintos: 190
+
+Detalle (con PII): /home/ubuntu/e3/p15/res/comparacion-qwen36-27b-fp8-doble_front.csv
+Agregado para el visor: /home/ubuntu/e3/p15/res/qwen36-27b-fp8-doble_front-gold.json
+Gold por documento (con PII, va cifrado): /home/ubuntu/e3/p15/res/qwen36-27b-fp8-doble_front-gold-docs.json

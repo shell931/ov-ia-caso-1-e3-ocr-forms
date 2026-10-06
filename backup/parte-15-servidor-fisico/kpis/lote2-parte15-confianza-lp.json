@@ -1,0 +1,423 @@
+{
+  "n_celdas": 5614,
+  "global": {
+    "lp": {
+      "n": 5614,
+      "errores": 733,
+      "sin_lp": 279,
+      "filas": [
+        {
+          "umbral": 10,
+          "marcadas_pct": 0.0,
+          "errores_atrapados_pct": 0.0,
+          "precision_pct": 0.0,
+          "exactitud_no_marcadas_pct": 86.9,
+          "exactitud_tras_revision_pct": 86.9
+        },
+        {
+          "umbral": 20,
+          "marcadas_pct": 0.3,
+          "errores_atrapados_pct": 2.5,
+          "precision_pct": 94.7,
+          "exactitud_no_marcadas_pct": 87.2,
+          "exactitud_tras_revision_pct": 87.3
+        },
+        {
+          "umbral": 30,
+          "marcadas_pct": 1.5,
+          "errores_atrapados_pct": 10.0,
+          "precision_pct": 86.9,
+          "exactitud_no_marcadas_pct": 88.1,
+          "exactitud_tras_revision_pct": 88.2
+        },
+        {
+          "umbral": 40,
+          "marcadas_pct": 3.5,
+          "errores_atrapados_pct": 22.0,
+          "precision_pct": 81.3,
+          "exactitud_no_marcadas_pct": 89.4,
+          "exactitud_tras_revision_pct": 89.8
+        },
+        {
+          "umbral": 50,
+          "marcadas_pct": 6.3,
+          "errores_atrapados_pct": 36.0,
+          "precision_pct": 74.4,
+          "exactitud_no_marcadas_pct": 91.1,
+          "exactitud_tras_revision_pct": 91.6
+        },
+        {
+          "umbral": 60,
+          "marcadas_pct": 11.6,
+          "errores_atrapados_pct": 55.7,
+          "precision_pct": 62.5,
+          "exactitud_no_marcadas_pct": 93.4,
+          "exactitud_tras_revision_pct": 94.2
+        },
+        {
+          "umbral": 70,
+          "marcadas_pct": 16.5,
+          "errores_atrapados_pct": 70.5,
+          "precision_pct": 55.7,
+          "exactitud_no_marcadas_pct": 95.4,
+          "exactitud_tras_revision_pct": 96.2
+        },
+        {
+          "umbral": 80,
+          "marcadas_pct": 21.7,
+          "errores_atrapados_pct": 78.7,
+          "precision_pct": 47.5,
+          "exactitud_no_marcadas_pct": 96.5,
+          "exactitud_tras_revision_pct": 97.2
+        },
+        {
+          "umbral": 90,
+          "marcadas_pct": 29.7,
+          "errores_atrapados_pct": 87.6,
+          "precision_pct": 38.5,
+          "exactitud_no_marcadas_pct": 97.7,
+          "exactitud_tras_revision_pct": 98.4
+        },
+        {
+          "umbral": 95,
+          "marcadas_pct": 36.5,
+          "errores_atrapados_pct": 91.7,
+          "precision_pct": 32.8,
+          "exactitud_no_marcadas_pct": 98.3,
+          "exactitud_tras_revision_pct": 98.9
+        }
+      ]
+    },
+    "declarada": {
+      "n": 5614,
+      "errores": 733,
+      "sin_lp": 0,
+      "filas": [
+        {
+          "umbral": 10,
+          "marcadas_pct": 5.0,
+          "errores_atrapados_pct": 2.2,
+          "precision_pct": 5.7,
+          "exactitud_no_marcadas_pct": 86.6,
+          "exactitud_tras_revision_pct": 87.2
+        },
+        {
+          "umbral": 20,
+          "marcadas_pct": 5.0,
+          "errores_atrapados_pct": 2.2,
+          "precision_pct": 5.7,
+          "exactitud_no_marcadas_pct": 86.6,
+          "exactitud_tras_revision_pct": 87.2
+        },
+        {
+          "umbral": 30,
+          "marcadas_pct": 5.0,
+          "errores_atrapados_pct": 2.2,
+          "precision_pct": 5.7,
+          "exactitud_no_marcadas_pct": 86.6,
+          "exactitud_tras_revision_pct": 87.2
+        },
+        {
+          "umbral": 40,
+          "marcadas_pct": 5.0,
+          "errores_atrapados_pct": 2.2,
+          "precision_pct": 5.7,
+          "exactitud_no_marcadas_pct": 86.6,
+          "exactitud_tras_revision_pct": 87.2
+        },
+        {
+          "umbral": 50,
+          "marcadas_pct": 5.4,
+          "errores_atrapados_pct": 2.3,
+          "precision_pct": 5.6,
+          "exactitud_no_marcadas_pct": 86.5,
+          "exactitud_tras_revision_pct": 87.2
+        },
+        {
+          "umbral": 60,
+          "marcadas_pct": 5.4,
+          "errores_atrapados_pct": 2.3,
+          "precision_pct": 5.6,
+          "exactitud_no_marcadas_pct": 86.5,
+          "exactitud_tras_revision_pct": 87.2
+        },
+        {
+          "umbral": 70,
+          "marcadas_pct": 6.3,
+          "errores_atrapados_pct": 7.8,
+          "precision_pct": 16.1,
+          "exactitud_no_marcadas_pct": 87.1,
+          "exactitud_tras_revision_pct": 88.0
+        },
+        {
+          "umbral": 80,
+          "marcadas_pct": 6.5,
+          "errores_atrapados_pct": 8.2,
+          "precision_pct": 16.5,
+          "exactitud_no_marcadas_pct": 87.2,
+          "exactitud_tras_revision_pct": 88.0
+        },
+        {
+          "umbral": 90,
+          "marcadas_pct": 8.7,
+          "errores_atrapados_pct": 8.2,
+          "precision_pct": 12.3,
+          "exactitud_no_marcadas_pct": 86.9,
+          "exactitud_tras_revision_pct": 88.0
+        },
+        {
+          "umbral": 95,
+          "marcadas_pct": 24.4,
+          "errores_atrapados_pct": 36.0,
+          "precision_pct": 19.3,
+          "exactitud_no_marcadas_pct": 88.9,
+          "exactitud_tras_revision_pct": 91.6
+        }
+      ]
+    },
+    "auc_lp": 92.0,
+    "auc_declarada": 47.8
+  },
+  "politica_revisar": {
+    "marcadas_pct": 16.9,
+    "errores_atrapados_pct": 70.8,
+    "exactitud_sin_revisar_pct": 86.9,
+    "exactitud_tras_revision_pct": 96.2
+  },
+  "por_campo": {
+    "ciudad": {
+      "auc_lp": 62.6,
+      "auc_declarada": 14.1
+    },
+    "comunidad_etnia": {
+      "auc_lp": 99.0,
+      "auc_declarada": 26.3
+    },
+    "direccion": {
+      "auc_lp": 65.0,
+      "auc_declarada": 58.5
+    },
+    "email": {
+      "auc_lp": 76.5,
+      "auc_declarada": 49.5
+    },
+    "etnia": {
+      "auc_lp": 94.5,
+      "auc_declarada": 34.4
+    },
+    "fecha_expedicion": {
+      "auc_lp": 96.8,
+      "auc_declarada": 49.8
+    },
+    "fecha_inscripcion": {
+      "auc_lp": 76.3,
+      "auc_declarada": 49.8
+    },
+    "formulario_no": {
+      "auc_lp": null,
+      "auc_declarada": null
+    },
+    "funcionario_cedula": {
+      "auc_lp": 82.0,
+      "auc_declarada": 50.0
+    },
+    "funcionario_nombre": {
+      "auc_lp": 86.2,
+      "auc_declarada": 55.2
+    },
+    "lee_braille": {
+      "auc_lp": 98.1,
+      "auc_declarada": 46.6
+    },
+    "nivel_estudio": {
+      "auc_lp": 71.6,
+      "auc_declarada": 12.3
+    },
+    "numero_documento": {
+      "auc_lp": 91.1,
+      "auc_declarada": 51.9
+    },
+    "primer_apellido": {
+      "auc_lp": 82.6,
+      "auc_declarada": 54.0
+    },
+    "primer_nombre": {
+      "auc_lp": 90.7,
+      "auc_declarada": 46.7
+    },
+    "segundo_apellido": {
+      "auc_lp": 92.0,
+      "auc_declarada": 55.6
+    },
+    "segundo_nombre": {
+      "auc_lp": 88.7,
+      "auc_declarada": 44.3
+    },
+    "telefono_fijo": {
+      "auc_lp": 93.3,
+      "auc_declarada": 42.4
+    },
+    "telefono_movil": {
+      "auc_lp": 90.5,
+      "auc_declarada": 50.4
+    },
+    "tipo_discapacidad": {
+      "auc_lp": 99.1,
+      "auc_declarada": 99.2
+    },
+    "tipo_documento": {
+      "auc_lp": null,
+      "auc_declarada": null
+    }
+  },
+  "umbrales_resumen": {
+    "60": {
+      "umbrales": {
+        "ciudad": 85,
+        "comunidad_etnia": 55,
+        "direccion": 65,
+        "email": 60,
+        "etnia": 100,
+        "fecha_expedicion": 85,
+        "fecha_inscripcion": 100,
+        "formulario_no": 0,
+        "funcionario_cedula": 85,
+        "funcionario_nombre": 55,
+        "lee_braille": 0,
+        "nivel_estudio": 101,
+        "numero_documento": 70,
+        "primer_apellido": 65,
+        "primer_nombre": 70,
+        "segundo_apellido": 50,
+        "segundo_nombre": 60,
+        "telefono_fijo": 101,
+        "telefono_movil": 75,
+        "tipo_discapacidad": 90,
+        "tipo_documento": 0
+      },
+      "en_B": {
+        "marcadas_pct": 25.7,
+        "errores_atrapados_pct": 67.2,
+        "exactitud_sin_revisar_pct": 87.0,
+        "exactitud_tras_revision_pct": 95.7
+      },
+      "todos_ajustados_en_todos": {
+        "marcadas_pct": 25.3,
+        "errores_atrapados_pct": 64.4,
+        "exactitud_sin_revisar_pct": 86.9,
+        "exactitud_tras_revision_pct": 95.4
+      }
+    },
+    "70": {
+      "umbrales": {
+        "ciudad": 95,
+        "comunidad_etnia": 55,
+        "direccion": 70,
+        "email": 60,
+        "etnia": 100,
+        "fecha_expedicion": 95,
+        "fecha_inscripcion": 100,
+        "formulario_no": 0,
+        "funcionario_cedula": 85,
+        "funcionario_nombre": 55,
+        "lee_braille": 0,
+        "nivel_estudio": 101,
+        "numero_documento": 80,
+        "primer_apellido": 85,
+        "primer_nombre": 75,
+        "segundo_apellido": 60,
+        "segundo_nombre": 70,
+        "telefono_fijo": 101,
+        "telefono_movil": 85,
+        "tipo_discapacidad": 90,
+        "tipo_documento": 0
+      },
+      "en_B": {
+        "marcadas_pct": 29.4,
+        "errores_atrapados_pct": 73.3,
+        "exactitud_sin_revisar_pct": 87.0,
+        "exactitud_tras_revision_pct": 96.5
+      },
+      "todos_ajustados_en_todos": {
+        "marcadas_pct": 29.5,
+        "errores_atrapados_pct": 73.8,
+        "exactitud_sin_revisar_pct": 86.9,
+        "exactitud_tras_revision_pct": 96.6
+      }
+    },
+    "80": {
+      "umbrales": {
+        "ciudad": 95,
+        "comunidad_etnia": 55,
+        "direccion": 75,
+        "email": 70,
+        "etnia": 100,
+        "fecha_expedicion": 95,
+        "fecha_inscripcion": 101,
+        "formulario_no": 0,
+        "funcionario_cedula": 95,
+        "funcionario_nombre": 60,
+        "lee_braille": 0,
+        "nivel_estudio": 101,
+        "numero_documento": 85,
+        "primer_apellido": 90,
+        "primer_nombre": 75,
+        "segundo_apellido": 65,
+        "segundo_nombre": 100,
+        "telefono_fijo": 101,
+        "telefono_movil": 90,
+        "tipo_discapacidad": 90,
+        "tipo_documento": 0
+      },
+      "en_B": {
+        "marcadas_pct": 34.5,
+        "errores_atrapados_pct": 79.3,
+        "exactitud_sin_revisar_pct": 87.0,
+        "exactitud_tras_revision_pct": 97.3
+      },
+      "todos_ajustados_en_todos": {
+        "marcadas_pct": 36.0,
+        "errores_atrapados_pct": 81.9,
+        "exactitud_sin_revisar_pct": 86.9,
+        "exactitud_tras_revision_pct": 97.6
+      }
+    },
+    "90": {
+      "umbrales": {
+        "ciudad": 100,
+        "comunidad_etnia": 55,
+        "direccion": 95,
+        "email": 85,
+        "etnia": 100,
+        "fecha_expedicion": 101,
+        "fecha_inscripcion": 101,
+        "formulario_no": 0,
+        "funcionario_cedula": 100,
+        "funcionario_nombre": 70,
+        "lee_braille": 0,
+        "nivel_estudio": 101,
+        "numero_documento": 90,
+        "primer_apellido": 100,
+        "primer_nombre": 100,
+        "segundo_apellido": 80,
+        "segundo_nombre": 100,
+        "telefono_fijo": 101,
+        "telefono_movil": 100,
+        "tipo_discapacidad": 90,
+        "tipo_documento": 0
+      },
+      "en_B": {
+        "marcadas_pct": 52.1,
+        "errores_atrapados_pct": 90.1,
+        "exactitud_sin_revisar_pct": 87.0,
+        "exactitud_tras_revision_pct": 98.7
+      },
+      "todos_ajustados_en_todos": {
+        "marcadas_pct": 47.7,
+        "errores_atrapados_pct": 91.3,
+        "exactitud_sin_revisar_pct": 86.9,
+        "exactitud_tras_revision_pct": 98.9
+      }
+    }
+  }
+}
