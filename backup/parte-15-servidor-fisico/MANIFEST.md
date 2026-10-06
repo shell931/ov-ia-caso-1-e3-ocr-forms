@@ -9,7 +9,7 @@ d2087ce7bfbf9fe1c9b430955b1dd4da  ./kpis/lote2-parte15-gold-kpis.json
 e0e7cc0a0844f92f4cb2defa0f1bd748  ./kpis/qwen36-27b-fp8-doble_front.kpi.txt
 b5adc5f92ce3acce88b63399236ccc6f  ./kpis/qwen36-27b-fp8-doble_front.log
 ab52f601d8fbc5e3c45b370ccd9ea82b  ./kpis/qwen36-27b-fp8-doble_front.lp.txt
-1f517835775a5ee2d6f6c8183dff2953  ./LEEME.md
+69b2c0c657174c886a31a3a7709b60cb  ./LEEME.md
 865d281aa9d12e679a9bdf0510926737  ./modelos/qwen25vl-32b.env
 4004dfc3c39b752029e6c27e5d6c1b49  ./modelos/qwen25vl-72b-awq.env
 1e63c3adfad8ea4cdf2058f10c56a38d  ./modelos/qwen25vl-7b.env
