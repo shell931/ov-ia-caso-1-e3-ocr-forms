@@ -54,6 +54,8 @@ caso-1-v2-e3/
 
 ## 📖 Documentación
 
+- **[Despliegue vigente en servidor físico (2× GPU) — Parte 14](backup/parte-14-servidor-fisico/DESPLIEGUE.md)** (bundle completo: compose fijado, workers, scripts de operación; ver [LEEME](backup/parte-14-servidor-fisico/LEEME.md))
+- [Parte 14 — Lote E3V2, 256 formularios con funcionario](docs/lote2-e3v2-parte14.md)
 - [Parte 8 — resultados, modelos y handoff](docs/parte8-resultados.md) (fuente de la corrida publicada en el visor)
 - [Parte 9 — gold_v2 teléfonos + discapacidad](docs/parte9-resultados.md)
 - [Backup para reinstalar en un servidor físico](backup/parte8-servidor-fisico/LEEME.md) (incluye [PARTE9.md](backup/parte8-servidor-fisico/PARTE9.md))

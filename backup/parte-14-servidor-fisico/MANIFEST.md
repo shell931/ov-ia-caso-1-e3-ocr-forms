@@ -1,6 +1,6 @@
 # MANIFEST Parte 14
 
-da5364602a9d62ec783239d9a6c77578  ./DESPLIEGUE.md
+dc9bf6689dceb17471e56c7ba792f247  ./DESPLIEGUE.md
 e8553d3a3e3cf924cb50e96e412ec406  ./docker-compose.yml
 07e9348de1f33d597539adb52c876c61  ./IMPLEMENTACION.md
 7a87813a747af84d8bae83767b774f85  ./kpis/lote2-parte14-gold-kpis.json
@@ -37,12 +37,12 @@ e94bf42aa3a8d006e75ad109d5765efd  ./scripts/corrida/l2_consume.py
 3651ddd8ef810dcfb341d3af1f18a859  ./scripts/corrida/l2_enqueue.py
 6de83ba5a8856c74a902640d9cb48874  ./scripts/corrida/preds_lote2.py
 a1952dc8503dbdc6fe28e8f4f9166afb  ./scripts/corrida/run_lote2.sh
-1d56a48c270eb4286d1509c4135676fd  ./scripts/despliegue/descargar_modelos.sh
+febb0f822690c647459474465684542e  ./scripts/despliegue/descargar_modelos.sh
 2294cba3a8621328ea10cd7b721b60d5  ./scripts/despliegue/encolar.py
 56b57ce98e2993b59535f17d90395db5  ./scripts/despliegue/procesar_lote.sh
 e270035de08b6fd3ceb5d0ad3f36fc52  ./scripts/despliegue/recolectar.py
 961dd7f7e3280025c7e5927cde3cebfd  ./scripts/despliegue/resultados_a_csv.py
-4c40779b74748eb1c8475ce302ffa8b1  ./scripts/despliegue/verificar.sh
+b2c4f9c1b96591e766d48df70db8ea6b  ./scripts/despliegue/verificar.sh
 f9e112a3acc38c6d9c11b0f1da9c4fe7  ./scripts/visor/chk14b.py
 7e3bbfae33177e92a24161d0bbc3f193  ./scripts/visor/chk14.py
 3086311d87f7f60de0cbe19858b68fbd  ./scripts/visor/chk306.py

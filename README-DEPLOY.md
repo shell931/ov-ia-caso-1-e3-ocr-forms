@@ -1,5 +1,8 @@
 # 🚀 Deploy Rápido - Caso 1 v2 - Formularios E3 (Servidor AWS IP: 3.17.139.133)
 
+> **Histórico.** La guía vigente para desplegar en un servidor con dos GPU es
+> [`backup/parte-14-servidor-fisico/DESPLIEGUE.md`](backup/parte-14-servidor-fisico/DESPLIEGUE.md).
+
 ## ⚡ Despliegue en 3 pasos
 
 ### 1️⃣ **Clonar / Actualizar Repo**

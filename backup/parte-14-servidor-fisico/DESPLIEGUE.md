@@ -69,7 +69,8 @@ bash scripts/despliegue/descargar_modelos.sh
 
 Baja `Qwen/Qwen2.5-VL-7B-Instruct@cc594898…` y
 `Qwen/Qwen2.5-7B-Instruct-AWQ@b2503754…` (21 GB) con el CLI de la propia
-imagen vLLM. Son públicos; `HF_TOKEN` es opcional.
+imagen vLLM. Son públicos; `HF_TOKEN` es opcional. Corre como el usuario
+actual, así que los archivos quedan a su nombre (no de `root`).
 
 ## 5. Levantar
 
@@ -86,7 +87,8 @@ docker compose ps
 | `caso1v2e3e3-ocr` | 8 workers OCR | — | — |
 | `caso1v2e3e3-nlp` | 12 workers NLP | — | — |
 
-Los vLLM tardan unos minutos en cargar. Cuando terminen:
+Los vLLM tardan en cargar (medido: ~5 min la primera vez, que compila y
+baja las imágenes; ~2 min en los arranques siguientes). Cuando terminen:
 
 ```bash
 bash scripts/despliegue/verificar.sh     # debe terminar en "TODO OK"
@@ -134,6 +136,13 @@ Esperado (ruido entre corridas ±0,3 en el total): TOTAL ≈ **92,4 %**,
 ~850 docs/h, ~37 nombres y ~50 direcciones `revisar`. Valores por campo en
 `kpis/lote2-parte14-gold-kpis.json`.
 
+Validación de esta carpeta (2026-10-06, clon limpio de `main`, modelos
+re-descargados por revisión, mismo hardware): 267/267 listos, 0 errores,
+19 min 35 s (818 docs/h), 85 campos `revisar`, **TOTAL 92,7 %** (5569 celdas),
+`funcionario_cedula` 74,5 %, `funcionario_nombre` 92,6 %.
+`resultados_a_csv.py` → 267 filas, separador `;`, columnas
+`campo`, `campo__conf`, `campo__revisar`.
+
 ## 8. Operación
 
 - Logs: `docker logs -f caso1v2e3e3-ocr` (o `-nlp`, `-vllm-vl`, `-vllm-nlp`).
@@ -169,4 +178,6 @@ Esperado (ruido entre corridas ±0,3 en el total): TOTAL ≈ **92,4 %**,
 | `Permission denied` al escribir en `/data/e3` dentro del contenedor | Es solo lectura a propósito; los scripts escriben en `/tmp` del contenedor y copian con `docker cp`. |
 | `verificar.sh` dice que un vLLM no responde | Recién arrancado: esperar. Si sigue: `docker logs caso1v2e3e3-vllm-vl` (VRAM ocupada en esa GPU, driver viejo). |
 | Página E-3 + E-4 en un mismo escaneo | Se procesa solo el E-3 de arriba (`pagina_e3.py`). Un escaneo girado o solo E-4 no se corrige. |
+| `rm` falla en `/data/hf-cache` con `Permission denied` | Pesos bajados antes como `root` (versión vieja del script o arranque de vLLM sin caché). No afecta; para limpiar: `sudo rm -rf` de esa carpeta. |
+| `verificar.sh` cuenta 0 workers | Los workers aún hacen `pip install` (~1 min tras `up`). Cuenta consumidores en RabbitMQ: esperar y repetir. |
 | Muchos `revisar` en nombres | Esperado (~14 %): letra ambigua; el VL tiende a completar con nombres frecuentes. |
