@@ -1,9 +1,10 @@
 # MANIFEST Parte 14
 
-8d6963c0c11929154dc0525a8321ecb2  ./docker-compose.yml
+da5364602a9d62ec783239d9a6c77578  ./DESPLIEGUE.md
+e8553d3a3e3cf924cb50e96e412ec406  ./docker-compose.yml
 07e9348de1f33d597539adb52c876c61  ./IMPLEMENTACION.md
 7a87813a747af84d8bae83767b774f85  ./kpis/lote2-parte14-gold-kpis.json
-01da1e4a808a1f348cebbbb659d3eabd  ./LEEME.md
+3de8022547f74d3ce80dfca2b907da41  ./LEEME.md
 f125df62f69158815beedbdce7f7eb9b  ./scripts/calibracion/alto.py
 7422b86da1dbc069dc6e5f1c57ea9451  ./scripts/calibracion/conf.py
 470ab8c01764ef2b99754275948b24e7  ./scripts/calibracion/crop41.py
@@ -36,6 +37,12 @@ e94bf42aa3a8d006e75ad109d5765efd  ./scripts/corrida/l2_consume.py
 3651ddd8ef810dcfb341d3af1f18a859  ./scripts/corrida/l2_enqueue.py
 6de83ba5a8856c74a902640d9cb48874  ./scripts/corrida/preds_lote2.py
 a1952dc8503dbdc6fe28e8f4f9166afb  ./scripts/corrida/run_lote2.sh
+1d56a48c270eb4286d1509c4135676fd  ./scripts/despliegue/descargar_modelos.sh
+2294cba3a8621328ea10cd7b721b60d5  ./scripts/despliegue/encolar.py
+56b57ce98e2993b59535f17d90395db5  ./scripts/despliegue/procesar_lote.sh
+e270035de08b6fd3ceb5d0ad3f36fc52  ./scripts/despliegue/recolectar.py
+961dd7f7e3280025c7e5927cde3cebfd  ./scripts/despliegue/resultados_a_csv.py
+4c40779b74748eb1c8475ce302ffa8b1  ./scripts/despliegue/verificar.sh
 f9e112a3acc38c6d9c11b0f1da9c4fe7  ./scripts/visor/chk14b.py
 7e3bbfae33177e92a24161d0bbc3f193  ./scripts/visor/chk14.py
 3086311d87f7f60de0cbe19858b68fbd  ./scripts/visor/chk306.py
@@ -50,4 +57,4 @@ e7f4466e0f2274f2ca065b2842a65730  ./workers/funcionario_vision.py
 37faea829d3035b34429a681f12e4d30  ./workers/pagina_e3.py
 9cf90911a321c69d0b9377450a049152  ./workers/postprocess_express.py
 00d845d7d6d085cc3fe98ca401b4127b  ./workers/primer_apellido_vision.py
-11477f5b36798e1cb05b6ac2ea7a2135  ./workers/requirements.txt
+fe283e7bc25609987288b4b358648009  ./workers/requirements.txt

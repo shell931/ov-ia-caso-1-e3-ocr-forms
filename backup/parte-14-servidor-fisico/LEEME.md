@@ -18,6 +18,8 @@ hay otro set de 256; el nombre del menú es el pedido).
 | Nombres marcados `revisar` | — | 37 (31 mal) |
 | docs/h (meta 1250) | 871 | 852 |
 
+Para desplegar en un servidor nuevo: **`DESPLIEGUE.md`**.
+
 Visor: https://shell931.github.io/e3-pages/ — menú
 **Lote E3V2 . Parte 14 (analisis 256 formularios)** (clave `lote2p14`).
 Detalle: `docs/lote2-e3v2-parte14.md`.
@@ -106,9 +108,11 @@ flowchart TB
 | Ruta | Qué es |
 | --- | --- |
 | `LEEME.md` | Este archivo |
+| `DESPLIEGUE.md` | **Guía para levantar esto en un servidor nuevo con 2 GPU** (requisitos, pasos, prueba de aceptación, seguridad) |
 | `IMPLEMENTACION.md` | Cableado del lector nuevo, calibración, cómo repetir |
 | `MANIFEST.md` | md5 de cada archivo |
-| `docker-compose.yml` | Compose del servidor (rabbitmq, vllm-vl, vllm-nlp, ocr, nlp) |
+| `docker-compose.yml` | Compose del servidor (rabbitmq, vllm-vl, vllm-nlp, ocr, nlp), con imágenes por digest y modelos por revisión |
+| `scripts/despliegue/` | `descargar_modelos.sh`, `verificar.sh`, `procesar_lote.sh` (+ `encolar.py` / `recolectar.py`), `resultados_a_csv.py` |
 | `workers/` | Los 12 archivos de `/app` tal cual corrieron (incluye `funcionario_vision.py`) |
 | `scripts/corrida/` | `run_lote2.sh`, `l2_enqueue.py`, `l2_consume.py`, `preds_lote2.py`, `gold_csv_to_json.py`, `compare_gold_real.py`, `build_lote2_gold_fragment.py`, `add_fragment.py` (+ versiones `enqueue_lote2.py` / `consume_lote2.py` del repo) |
 | `scripts/calibracion/` | Pruebas de recortes y prompts de todo el lote E3V2: `tfunc.py`–`tfunc4.py` / `tspot.py` / `tnom*.py` (funcionario), `tcom*.py` (comunidad), `tdir.py` / `dirstats.py` (dirección), `alto.py` / `vnorm.py` (páginas E-3+E-4), `crop*.py`, `conf.py`, `diff.py`, `sub.py` |
