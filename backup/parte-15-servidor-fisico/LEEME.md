@@ -308,8 +308,10 @@ python3 scripts/corrida/compare_gold_real.py \
 | `scripts/corrida/` | compare / preds / fragment / vault |
 | `scripts/calibracion/` | Suite P14 (reutilizada) |
 | `scripts/visor/` | Chequeos Playwright |
+| `parte15_resultados_vs_gold_fable.xlsx` | Excel con los 267 resultados, mismas columnas que el gold Fable (hoja con conf_lp/revisar) |
+| `parte15_resultados_vs_gold_fable.csv` | Mismo contenido en CSV (utf-8-sig, `;`) |
 | `kpis/` | Agregados sin PII + comparativa muestra 80 + KPI/LP de la corrida |
 
-Sin PII en esta carpeta: ni TIFF, ni gold, ni CSV de comparación, ni
-valores por documento (esos van solo dentro del vault cifrado del visor /
-`~/e3/p15/res/` en el servidor).
+Esta carpeta incluye el Excel/CSV de **resultados del pipeline** (PII),
+pedido para descarga. Sigue sin ir el gold Fable original ni los TIFF;
+el detalle celda a celda del visor sigue en el vault cifrado.

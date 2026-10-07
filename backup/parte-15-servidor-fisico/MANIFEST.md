@@ -9,7 +9,7 @@ d2087ce7bfbf9fe1c9b430955b1dd4da  ./kpis/lote2-parte15-gold-kpis.json
 e0e7cc0a0844f92f4cb2defa0f1bd748  ./kpis/qwen36-27b-fp8-doble_front.kpi.txt
 b5adc5f92ce3acce88b63399236ccc6f  ./kpis/qwen36-27b-fp8-doble_front.log
 ab52f601d8fbc5e3c45b370ccd9ea82b  ./kpis/qwen36-27b-fp8-doble_front.lp.txt
-69b2c0c657174c886a31a3a7709b60cb  ./LEEME.md
+07be4f8afb8b741e365e7ffc9cdd1e06  ./LEEME.md
 865d281aa9d12e679a9bdf0510926737  ./modelos/qwen25vl-32b.env
 4004dfc3c39b752029e6c27e5d6c1b49  ./modelos/qwen25vl-72b-awq.env
 1e63c3adfad8ea4cdf2058f10c56a38d  ./modelos/qwen25vl-7b.env
@@ -20,6 +20,8 @@ fa37bd13b19592624a6d0961ed5d3328  ./modelos/qwen36-27b-fp8-doble.env
 747bcc88be0d8629384642d1dcb61d4e  ./modelos/qwen36-27b-rapido.env
 48e3090d5f18d3531030da988c0779b5  ./modelos/qwen38-27b.env
 c998ff08afed98084b1a1f95258c9ffc  ./modelos/qwen3vl-32b.env
+f74b0d5d731fad09f31e8b935b913360  ./parte15_resultados_vs_gold_fable.csv
+5a7c3de0a30164221abb56fed2bb989f  ./parte15_resultados_vs_gold_fable.xlsx
 f125df62f69158815beedbdce7f7eb9b  ./scripts/calibracion/alto.py
 7422b86da1dbc069dc6e5f1c57ea9451  ./scripts/calibracion/conf.py
 470ab8c01764ef2b99754275948b24e7  ./scripts/calibracion/crop41.py
