@@ -51,6 +51,8 @@ sobre el hardware nuevo y medir cuánto se pierde/gana contra el baseline.
 | `../workers:/app` | el compose vive en esta subcarpeta | — |
 | `--dtype ${VL_DTYPE}` en `vllm-vl` y `vllm-vl2` | Turing no tiene BF16 | `auto` |
 | `--gpu-memory-utilization ${NLP_MEM}` en `vllm` | liberar GPU1 para VL2 | `0.40` |
+| `--tensor-parallel-size ${VL_TP}` en `vllm-vl` y `vllm-vl2` | repartir el VL en T4 de 16 GB (g4dn) | `1` |
+| `VL_GPUS` / `VL2_GPUS` / `NLP_GPUS` | elegir GPUs por servicio | `0` / `1` / `1` |
 
 Mismas imágenes por digest, mismos modelos por revisión, mismo `name:` y
 nombres de contenedor (los scripts de `scripts/despliegue/` siguen sirviendo).
@@ -100,6 +102,32 @@ No hay Quadro RTX 8000 en AWS. Se separa en dos validaciones:
 | `g6e.12xlarge` (4× L40S 48 GB, `sm_89`), usando 2 GPU | layout de VRAM a 48 GB (`VL_MEM`/`VL2_MEM`/`NLP_MEM`) | tiene BF16/FP8 nativos → falsos positivos de compatibilidad; throughput optimista |
 
 El throughput real solo se mide en el R740xd.
+
+### Validación elegida: `g4dn.metal` (8× T4 16 GB, `sm_75`)
+
+Misma arquitectura que la RTX 8000, así que mide **compatibilidad y KPI en
+FP16**; no mide docs/h ni el layout de memoria del Dell. Como cada T4 tiene
+16 GB, el VL se reparte con tensor parallel (`VL_TP`) y cada servicio elige
+sus GPUs (`VL_GPUS` / `VL2_GPUS` / `NLP_GPUS`; defaults = P15).
+
+| Env | VL | NLP | Libres |
+| --- | --- | --- | --- |
+| `g4dn-metal-qwen25vl-7b.env` (control) | 7B FP16, TP=2, GPU 0-1 | GPU 4 (0,85) | 2, 3, 5-7 |
+| `g4dn-metal-qwen36-27b-fp8.env` | 27B FP8, TP=4, GPU 0-3 | GPU 4 (0,85) | 5-7 |
+
+TP verificado contra los `config.json`: 27B → 24 heads / 4 KV / intermediate
+17408 (÷4 = 4352, múltiplo del bloque FP8 de 128); 7B → 28 heads / 4 KV (÷2).
+
+```bash
+bash scripts/p15/probar_modelo.sh planteamiento_rtx_8000/modelos/g4dn-metal-qwen25vl-7b.env p15_muestra80
+bash scripts/p15/probar_modelo.sh planteamiento_rtx_8000/modelos/g4dn-metal-qwen36-27b-fp8.env p15_muestra80
+```
+
+Comprobar al levantar: `docker exec caso1v2e3e3-vllm-vl nvidia-smi -L` debe
+listar las GPUs de `VL_GPUS` (el compose pasa `"0,1,2,3"` como un solo
+`device_id`; Docker lo une en `NVIDIA_VISIBLE_DEVICES`). Las T4 no tienen
+NVLink: TP va por PCIe, más lento, sin efecto en el KPI salvo décimas por el
+orden de las sumas.
 
 ## Plan B si el 27B-FP8 no corre o degrada en Turing
 

@@ -6,6 +6,8 @@ name: caso1v2e3
 #   - workers por ../workers (este archivo vive en planteamiento_rtx_8000/)
 #   - VL_DTYPE → --dtype en vllm-vl / vllm-vl2 (Turing no tiene BF16: float16)
 #   - NLP_MEM → --gpu-memory-utilization del NLP (antes 0.40 fijo)
+#   - VL_TP → --tensor-parallel-size, y VL_GPUS / VL2_GPUS / NLP_GPUS para
+#     elegir GPUs por servicio ("0,1,2,3" con TP=4): validación en g4dn (T4 16 GB)
 # Sin variables se comporta igual que la Parte 15.
 # Se usa desde la raíz del repo: los modelos/*.env de esta carpeta definen
 # COMPOSE_FILE, así scripts/p15/probar_modelo.sh funciona sin cambios.
@@ -61,7 +63,7 @@ services:
     ports:
       - "8000:8000"
     environment:
-      NVIDIA_VISIBLE_DEVICES: "1"
+      NVIDIA_VISIBLE_DEVICES: "${NLP_GPUS:-1}"
       HF_HOME: /root/.cache/huggingface
     volumes:
       - ${HF_HOST:-/data/hf-cache}:/root/.cache/huggingface
@@ -85,7 +87,7 @@ services:
         reservations:
           devices:
             - driver: nvidia
-              device_ids: ["1"]
+              device_ids: ["${NLP_GPUS:-1}"]
               capabilities: [gpu]
 
   # ═══════════════════════════════════════════════════════════
@@ -99,7 +101,7 @@ services:
     ports:
       - "8001:8000"
     environment:
-      NVIDIA_VISIBLE_DEVICES: "0"
+      NVIDIA_VISIBLE_DEVICES: "${VL_GPUS:-0}"
       HF_HOME: /root/.cache/huggingface
     volumes:
       - ${HF_HOST:-/data/hf-cache}:/root/.cache/huggingface
@@ -112,6 +114,8 @@ services:
       - ${VL_REV:-cc594898137f460bfe9f0759e9844b3ce807cfb5}
       - --gpu-memory-utilization
       - "${VL_MEM:-0.90}"
+      - --tensor-parallel-size
+      - "${VL_TP:-1}"
       - --dtype
       - ${VL_DTYPE:-auto}
       - --max-model-len
@@ -127,7 +131,7 @@ services:
         reservations:
           devices:
             - driver: nvidia
-              device_ids: ["0"]
+              device_ids: ["${VL_GPUS:-0}"]
               capabilities: [gpu]
 
   # ═══════════════════════════════════════════════════════════
@@ -174,7 +178,7 @@ services:
     ports:
       - "8002:8000"
     environment:
-      NVIDIA_VISIBLE_DEVICES: "1"
+      NVIDIA_VISIBLE_DEVICES: "${VL2_GPUS:-1}"
       HF_HOME: /root/.cache/huggingface
     volumes:
       - ${HF_HOST:-/data/hf-cache}:/root/.cache/huggingface
@@ -187,6 +191,8 @@ services:
       - ${VL_REV:-cc594898137f460bfe9f0759e9844b3ce807cfb5}
       - --gpu-memory-utilization
       - "${VL2_MEM:-0.50}"
+      - --tensor-parallel-size
+      - "${VL_TP:-1}"
       - --dtype
       - ${VL_DTYPE:-auto}
       - --max-model-len
@@ -202,7 +208,7 @@ services:
         reservations:
           devices:
             - driver: nvidia
-              device_ids: ["1"]
+              device_ids: ["${VL2_GPUS:-1}"]
               capabilities: [gpu]
 
   ocr2:
