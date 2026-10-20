@@ -10,7 +10,7 @@ name: caso1v2e3
 #     elegir GPUs por servicio ("0,1,2,3" con TP=4): validación en g4dn (T4 16 GB)
 # Sin variables se comporta igual que la Parte 15.
 # Se usa desde la raíz del repo: los modelos/*.env de esta carpeta definen
-# COMPOSE_FILE, así scripts/p15/probar_modelo.sh funciona sin cambios.
+# COMPOSE_FILE; se corre con planteamiento_rtx_8000/probar_modelo.sh (ver README).
 # Rutas del host: DATA_HOST (formularios, default /data/e3) y HF_HOST (pesos,
 # default /data/hf-cache). Ver README.md de esta carpeta.
 

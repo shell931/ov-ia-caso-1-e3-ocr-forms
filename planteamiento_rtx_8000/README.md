@@ -73,20 +73,29 @@ Presupuesto GPU1 en `doble`: 0,72 × 48 ≈ 34,5 GB para VL2 (30,9 GB de pesos �
 según `nvidia-smi` y docs/h medidos.
 
 Todos los envs definen `COMPOSE_FILE=planteamiento_rtx_8000/docker-compose.yml`,
-así que `scripts/p15/probar_modelo.sh` se usa **sin cambios desde la raíz**.
+así que se corre desde la raíz del repo con `planteamiento_rtx_8000/probar_modelo.sh`.
+Es una copia de `scripts/p15/probar_modelo.sh` con un solo cambio: en la raíz,
+`preds_lote2.py` y `compare_gold_real.py` están en `scripts/lote2/` (idénticos a
+los de `backup/parte-15-servidor-fisico/scripts/corrida/`), y el original los
+busca en `scripts/corrida/`, que en la raíz no existe.
+
+`scripts/despliegue/descargar_modelos.sh` baja solo el 27B-FP8 y el NLP 7B-AWQ.
+El VL 7B del control (`Qwen2.5-VL-7B-Instruct`) lo descarga vLLM al arrancar,
+así que el servidor necesita salida a Hugging Face (o copiar ese modelo a
+`/data/hf-cache` antes).
 
 ## Cómo correr (desde la raíz del repo)
 
 ```bash
 # 1. control 7B (muestra 80)
-bash scripts/p15/probar_modelo.sh planteamiento_rtx_8000/modelos/qwen25vl-7b-turing.env p15_muestra80
+bash planteamiento_rtx_8000/probar_modelo.sh planteamiento_rtx_8000/modelos/qwen25vl-7b-turing.env p15_muestra80
 
 # 2. 27B-FP8 una réplica (muestra 80)
-bash scripts/p15/probar_modelo.sh planteamiento_rtx_8000/modelos/qwen36-27b-fp8-turing-simple.env p15_muestra80
+bash planteamiento_rtx_8000/probar_modelo.sh planteamiento_rtx_8000/modelos/qwen36-27b-fp8-turing-simple.env p15_muestra80
 
 # 3. 27B-FP8 doble (muestra 80, luego full 267)
-bash scripts/p15/probar_modelo.sh planteamiento_rtx_8000/modelos/qwen36-27b-fp8-turing-doble.env p15_muestra80
-bash scripts/p15/probar_modelo.sh planteamiento_rtx_8000/modelos/qwen36-27b-fp8-turing-doble.env front
+bash planteamiento_rtx_8000/probar_modelo.sh planteamiento_rtx_8000/modelos/qwen36-27b-fp8-turing-doble.env p15_muestra80
+bash planteamiento_rtx_8000/probar_modelo.sh planteamiento_rtx_8000/modelos/qwen36-27b-fp8-turing-doble.env front
 ```
 
 Comparar siempre contra P15: muestra 80 → 95,3 % / 966 docs/h (`fp8-doble`);
@@ -119,8 +128,8 @@ TP verificado contra los `config.json`: 27B → 24 heads / 4 KV / intermediate
 17408 (÷4 = 4352, múltiplo del bloque FP8 de 128); 7B → 28 heads / 4 KV (÷2).
 
 ```bash
-bash scripts/p15/probar_modelo.sh planteamiento_rtx_8000/modelos/g4dn-metal-qwen25vl-7b.env p15_muestra80
-bash scripts/p15/probar_modelo.sh planteamiento_rtx_8000/modelos/g4dn-metal-qwen36-27b-fp8.env p15_muestra80
+bash planteamiento_rtx_8000/probar_modelo.sh planteamiento_rtx_8000/modelos/g4dn-metal-qwen25vl-7b.env p15_muestra80
+bash planteamiento_rtx_8000/probar_modelo.sh planteamiento_rtx_8000/modelos/g4dn-metal-qwen36-27b-fp8.env p15_muestra80
 ```
 
 Comprobar al levantar: `docker exec caso1v2e3e3-vllm-vl nvidia-smi -L` debe
