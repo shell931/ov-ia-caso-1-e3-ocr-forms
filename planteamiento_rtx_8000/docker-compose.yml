@@ -8,6 +8,8 @@ name: caso1v2e3
 #   - NLP_MEM → --gpu-memory-utilization del NLP (antes 0.40 fijo)
 #   - VL_TP → --tensor-parallel-size, y VL_GPUS / VL2_GPUS / NLP_GPUS para
 #     elegir GPUs por servicio ("0,1,2,3" con TP=4): validación en g4dn (T4 16 GB)
+#   - --disable-custom-all-reduce: con TP>1 en T4 (P2P por puente PCIe, sin
+#     NVLink) el all-reduce CUSTOM de vLLM se cuelga al arrancar; con TP=1 no aplica
 # Sin variables se comporta igual que la Parte 15.
 # Se usa desde la raíz del repo: los modelos/*.env de esta carpeta definen
 # COMPOSE_FILE; se corre con planteamiento_rtx_8000/probar_modelo.sh (ver README).
@@ -116,6 +118,7 @@ services:
       - "${VL_MEM:-0.90}"
       - --tensor-parallel-size
       - "${VL_TP:-1}"
+      - --disable-custom-all-reduce
       - --dtype
       - ${VL_DTYPE:-auto}
       - --max-model-len
@@ -193,6 +196,7 @@ services:
       - "${VL2_MEM:-0.50}"
       - --tensor-parallel-size
       - "${VL_TP:-1}"
+      - --disable-custom-all-reduce
       - --dtype
       - ${VL_DTYPE:-auto}
       - --max-model-len
