@@ -79,6 +79,20 @@ Es una copia de `scripts/p15/probar_modelo.sh` con un solo cambio: en la raíz,
 los de `backup/parte-15-servidor-fisico/scripts/corrida/`), y el original los
 busca en `scripts/corrida/`, que en la raíz no existe.
 
+**Nombres de los TIFF.** En `s3://forme3/E3V2/front_300/` los archivos se llaman
+`000000010010101;<formulario>.tif`, pero el gold usa solo `<formulario>` como id y
+el pipeline usa el nombre del archivo como `doc_id` (y lo usa para completar
+`formulario_no` cuando el modelo no lo lee, ~80 % de los casos). Hay que
+quitar el prefijo al copiarlos, como se hizo en P15 (paso no documentado allí):
+
+```bash
+aws s3 sync s3://forme3/E3V2/front_300/ /data/e3/front/
+cd /data/e3/front && for f in '000000010010101;'*.tif; do mv -n -- "$f" "${f#000000010010101;}"; done
+```
+
+Sin esto el KPI cae unos 4 puntos (`formulario_no` 18 % en vez de 99,6 %) y
+`compare_gold_real.py` no empareja ningún documento.
+
 `scripts/despliegue/descargar_modelos.sh` baja solo el 27B-FP8 y el NLP 7B-AWQ.
 El VL 7B del control (`Qwen2.5-VL-7B-Instruct`) lo descarga vLLM al arrancar,
 así que el servidor necesita salida a Hugging Face (o copiar ese modelo a
@@ -131,6 +145,12 @@ TP verificado contra los `config.json`: 27B → 24 heads / 4 KV / intermediate
 bash planteamiento_rtx_8000/probar_modelo.sh planteamiento_rtx_8000/modelos/g4dn-metal-qwen25vl-7b.env p15_muestra80
 bash planteamiento_rtx_8000/probar_modelo.sh planteamiento_rtx_8000/modelos/g4dn-metal-qwen36-27b-fp8.env p15_muestra80
 ```
+
+**Control 7B medido en g4dn.metal (2026-10-21):** 267/267 docs, 0 errores,
+KPI `conf_real` **92,6 %** (P15 con 7B: 92,3 %), `formulario_no` 99,6 %, AUC
+`conf_lp` 86,2, exactitud tras revisar 97,0 %. 63,5 docs/h (no representativo:
+T4 con TP=2 por PCIe y `enforce-eager`). Backend de atención `TRITON_ATTN`
+(FlashAttention 2 no soporta `sm_75`). Necesitó `--disable-custom-all-reduce`.
 
 Comprobar al levantar: `docker exec caso1v2e3e3-vllm-vl nvidia-smi -L` debe
 listar las GPUs de `VL_GPUS` (el compose pasa `"0,1,2,3"` como un solo
