@@ -1,5 +1,8 @@
 # Planteamiento RTX 8000 — Dell R740xd (Turing, 2× 48 GB)
 
+> **Para desplegar en el Dell: [`DESPLIEGUE_DELL.md`](DESPLIEGUE_DELL.md)** (tareas B2–B4,
+> con `instalar_servidor.sh` y `preparar_datos.sh`, probados en g4dn.metal).
+
 Nuevo planteamiento por cambio de infraestructura. **La Parte 15 sigue siendo
 la prueba oficial** (95,7 % `conf_real`, 934 docs/h en g7e.12xlarge) y no se
 modifica: ni el `docker-compose.yml` de la raíz, ni `modelos/`, ni `workers/`,
