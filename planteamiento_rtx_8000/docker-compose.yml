@@ -10,6 +10,8 @@ name: caso1v2e3
 #     elegir GPUs por servicio ("0,1,2,3" con TP=4): validación en g4dn (T4 16 GB)
 #   - --disable-custom-all-reduce: con TP>1 en T4 (P2P por puente PCIe, sin
 #     NVLink) el all-reduce CUSTOM de vLLM se cuelga al arrancar; con TP=1 no aplica
+#   - Sin internet en operación: workers con imagen propia (Dockerfile.workers, sin
+#     pip install al arrancar) y vLLM con HF_HUB_OFFLINE y VLLM_NO_USAGE_STATS
 # Sin variables se comporta igual que la Parte 15.
 # Se usa desde la raíz del repo: los modelos/*.env de esta carpeta definen
 # COMPOSE_FILE; se corre con planteamiento_rtx_8000/probar_modelo.sh (ver README).
@@ -67,6 +69,10 @@ services:
     environment:
       NVIDIA_VISIBLE_DEVICES: "${NLP_GPUS:-1}"
       HF_HOME: /root/.cache/huggingface
+      HF_HUB_OFFLINE: "1"          # pesos solo desde /data/hf-cache
+      TRANSFORMERS_OFFLINE: "1"
+      VLLM_NO_USAGE_STATS: "1"     # vLLM envía estadísticas de uso por defecto
+      DO_NOT_TRACK: "1"
     volumes:
       - ${HF_HOST:-/data/hf-cache}:/root/.cache/huggingface
     command:
@@ -105,6 +111,10 @@ services:
     environment:
       NVIDIA_VISIBLE_DEVICES: "${VL_GPUS:-0}"
       HF_HOME: /root/.cache/huggingface
+      HF_HUB_OFFLINE: "1"          # pesos solo desde /data/hf-cache
+      TRANSFORMERS_OFFLINE: "1"
+      VLLM_NO_USAGE_STATS: "1"     # vLLM envía estadísticas de uso por defecto
+      DO_NOT_TRACK: "1"
     volumes:
       - ${HF_HOST:-/data/hf-cache}:/root/.cache/huggingface
     command:
@@ -141,7 +151,10 @@ services:
   #  OCR WORKERS - 8 workers (CPU/GPU 0)
   # ═══════════════════════════════════════════════════════════
   ocr:
-    image: python:3.11-slim@sha256:bab1b7ef4b450c81002278d035eff85ebe394ae94df904f7a3ba14f7e16e487b
+    image: e3-workers:p16
+    build:
+      context: ..
+      dockerfile: planteamiento_rtx_8000/Dockerfile.workers
     container_name: caso1v2e3e3-ocr
     depends_on:
       rabbitmq:
@@ -156,7 +169,6 @@ services:
     working_dir: /app
     command: >
       bash -c "
-        pip install -q -r requirements.txt &&
         for i in $$(seq 1 ${OCR_WORKERS:-8}); do
           python -u ocr_worker.py &
         done &&
@@ -183,6 +195,10 @@ services:
     environment:
       NVIDIA_VISIBLE_DEVICES: "${VL2_GPUS:-1}"
       HF_HOME: /root/.cache/huggingface
+      HF_HUB_OFFLINE: "1"          # pesos solo desde /data/hf-cache
+      TRANSFORMERS_OFFLINE: "1"
+      VLLM_NO_USAGE_STATS: "1"     # vLLM envía estadísticas de uso por defecto
+      DO_NOT_TRACK: "1"
     volumes:
       - ${HF_HOST:-/data/hf-cache}:/root/.cache/huggingface
     command:
@@ -216,7 +232,7 @@ services:
               capabilities: [gpu]
 
   ocr2:
-    image: python:3.11-slim@sha256:bab1b7ef4b450c81002278d035eff85ebe394ae94df904f7a3ba14f7e16e487b
+    image: e3-workers:p16
     container_name: caso1v2e3e3-ocr2
     profiles: ["doble"]
     depends_on:
@@ -233,7 +249,6 @@ services:
     working_dir: /app
     command: >
       bash -c "
-        pip install -q -r requirements.txt &&
         for i in $$(seq 1 ${OCR_WORKERS:-8}); do
           python -u ocr_worker.py &
         done &&
@@ -245,7 +260,7 @@ services:
   #  NLP WORKERS - 12 workers (CPU)
   # ═══════════════════════════════════════════════════════════
   nlp:
-    image: python:3.11-slim@sha256:bab1b7ef4b450c81002278d035eff85ebe394ae94df904f7a3ba14f7e16e487b
+    image: e3-workers:p16
     container_name: caso1v2e3e3-nlp
     depends_on:
       rabbitmq:
@@ -259,7 +274,6 @@ services:
     working_dir: /app
     command: >
       bash -c "
-        pip install -q -r requirements.txt &&
         for i in {1..12}; do
           python -u nlp_worker.py &
         done &&

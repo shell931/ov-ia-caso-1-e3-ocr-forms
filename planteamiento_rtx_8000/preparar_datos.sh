@@ -65,6 +65,10 @@ docker image inspect "$IMG" >/dev/null 2>&1 || docker pull -q "$IMG" >/dev/null
 docker run --rm --entrypoint python3 "$IMG" -c \
   "import torch, vllm; a = torch.cuda.get_arch_list(); print('  ok    vllm', vllm.__version__, '· torch', torch.__version__, '·', a); assert 'sm_75' in a, 'sin kernels para Turing (sm_75)'"
 
+echo "== Imagen de los workers (dependencias preinstaladas: arrancan sin red)"
+docker compose -f planteamiento_rtx_8000/docker-compose.yml build -q ocr
+ok "$(docker image inspect e3-workers:p16 --format 'e3-workers:p16 · {{.Size}} bytes')"
+
 echo "== Pesos en $HF_HOST"
 HF_HOST=$HF_HOST bash scripts/despliegue/descargar_modelos.sh 2>&1 | grep -E '^==|ok|G\s'
 if [ "$CONTROL" = 1 ]; then

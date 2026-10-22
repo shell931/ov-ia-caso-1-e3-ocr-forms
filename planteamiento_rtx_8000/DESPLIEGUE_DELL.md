@@ -63,6 +63,32 @@ Los envs del Dell (`turing-simple`, `turing-doble`) no se pudieron probar en AWS
 porque allá no hay GPUs de 48 GB: los porcentajes de memoria salen de cuentas
 (pesos del 27B = 30,9 GB) y se ajustan en B5.
 
+## Operación sin internet (B7b.6)
+
+Proyecto gubernamental: en operación nada sale a internet. Internet solo hace falta
+en la instalación (B3–B4), para traer imágenes, pesos y paquetes.
+
+- **Workers**: imagen propia `e3-workers:p16` (`Dockerfile.workers`) con las
+  dependencias ya instaladas. El compose de la Parte 15 hacía `pip install` en cada
+  arranque y **sin internet los workers no levantaban**. `preparar_datos.sh` la construye.
+- **vLLM**: `HF_HUB_OFFLINE=1` y `TRANSFORMERS_OFFLINE=1` (carga los pesos desde
+  `/data/hf-cache` sin consultar Hugging Face) y `VLLM_NO_USAGE_STATS=1` /
+  `DO_NOT_TRACK=1` (vLLM envía estadísticas de uso por defecto).
+- **Workers → vLLM**: el cliente `openai` apunta al vLLM local; no llama a OpenAI.
+
+Prueba de aceptación:
+
+```bash
+bash planteamiento_rtx_8000/sin_internet.sh on
+bash planteamiento_rtx_8000/probar_modelo.sh planteamiento_rtx_8000/modelos/qwen36-27b-fp8-turing-simple.env front
+bash planteamiento_rtx_8000/sin_internet.sh estado   # tiene que dar 0
+bash planteamiento_rtx_8000/sin_internet.sh off
+```
+
+Verificado en g4dn.metal (2026-10-22): 20/20 formularios sin errores con la salida
+bloqueada, **0 intentos de salida**, KPI 96,1 % vs 96,2 % con internet en los mismos
+20 documentos.
+
 ## Problemas conocidos (vistos en g4dn.metal)
 
 | Síntoma | Causa | Arreglo |
@@ -73,6 +99,7 @@ porque allá no hay GPUs de 48 GB: los porcentajes de memoria salen de cuentas
 | `compare_gold_real.py`: "Sin coincidencias gold" | TIFF con el prefijo de S3 | `preparar_datos.sh` los copia sin prefijo |
 | KPI ~4 puntos abajo y `formulario_no` ~18 % | Mismo prefijo: `nlp_worker` completa `formulario_no` con los dígitos del nombre | Igual que arriba |
 | `probar_modelo.sh` falla en el paso de preds | El original busca `scripts/corrida/` | Usar `planteamiento_rtx_8000/probar_modelo.sh` |
+| Workers no arrancan sin internet (`pip install` falla) | El compose de la Parte 15 instala dependencias al arrancar | Imagen `e3-workers:p16` (ya en el compose del planteamiento) |
 | `ERROR ... FA version 2 is not supported` en el log de vLLM | FlashAttention 2 no soporta Turing | Esperado: vLLM usa `TRITON_ATTN` sola |
 
 ## Referencias

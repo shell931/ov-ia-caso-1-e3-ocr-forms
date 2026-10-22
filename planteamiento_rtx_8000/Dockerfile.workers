@@ -1,0 +1,8 @@
+# Workers OCR/NLP con dependencias preinstaladas: el contenedor arranca sin red
+# (el compose de la Parte 15 hacía pip install en cada arranque contra PyPI).
+# Se construye una vez durante la instalación (preparar_datos.sh) con internet.
+# El código de workers/ se monta como volumen, igual que en la Parte 15.
+FROM python:3.11-slim@sha256:bab1b7ef4b450c81002278d035eff85ebe394ae94df904f7a3ba14f7e16e487b
+COPY workers/requirements.txt /tmp/requirements.txt
+RUN pip install --no-cache-dir -q -r /tmp/requirements.txt && rm /tmp/requirements.txt
+WORKDIR /app
