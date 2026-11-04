@@ -1,7 +1,7 @@
 # 🚀 Deploy Rápido - Caso 1 v2 - Formularios E3 (Servidor AWS IP: 3.17.139.133)
 
-> **Vigente (Parte 15, KPI 95,7 %):** [`backup/parte-15-servidor-fisico/DESPLIEGUE.md`](backup/parte-15-servidor-fisico/DESPLIEGUE.md).
-> Parte 14 (7B, 92,4 %): [`backup/parte-14-servidor-fisico/DESPLIEGUE.md`](backup/parte-14-servidor-fisico/DESPLIEGUE.md).
+> **Vigente (Parte 15, KPI 95,7 %):** [`pruebas/lote2-e3v2/parte-15/servidor/DESPLIEGUE.md`](pruebas/lote2-e3v2/parte-15/servidor/DESPLIEGUE.md).
+> Parte 14 (7B, 92,4 %): [`pruebas/lote2-e3v2/parte-14/servidor/DESPLIEGUE.md`](pruebas/lote2-e3v2/parte-14/servidor/DESPLIEGUE.md).
 
 ## ⚡ Despliegue en 3 pasos
 
@@ -78,7 +78,7 @@ sudo docker compose logs -f ocr nlp
 
 ## 📖 Documentación Completa
 
-Ver: [`docs/deploy-completo-aws.md`](docs/deploy-completo-aws.md)
+Ver: [`pruebas/lote1-1251/parte-04/deploy-completo-aws.md`](pruebas/lote1-1251/parte-04/deploy-completo-aws.md)
 
 - Arquitectura detallada
 - Troubleshooting
@@ -103,7 +103,7 @@ ia-analisis/
 │       └── test_mejoras.sh          ← Test rápido (10 docs)
 ├── scripts/
 │   └── deploy_completo_aws.sh       ← 🚀 Deploy automático
-└── docs/
+└── pruebas/lote1-1251/parte-04/
     └── deploy-completo-aws.md       ← Documentación completa
 ```
 
