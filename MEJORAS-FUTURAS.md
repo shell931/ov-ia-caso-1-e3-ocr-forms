@@ -39,7 +39,7 @@ casillas, dirección, dígitos). Parte 10 bajó docs/h al sumar crops.
    **Probado (Parte 12):** Qwen2.5-VL-3B en GPU1 para dígitos/casillas →
    conf_real **69,8 %** (casillas ~1–28 %) y docs/h **igual** (~872).
    Descartado con 3B; cableado queda opcional (`VLLM_VL_SMALL_URL`).
-   Ver `docs/parte12-resultados.md`.
+   Ver `pruebas/lote1-1251/parte-12/resultados.md`.
 
 **Qué se necesita:**
 
@@ -116,7 +116,7 @@ Sin más datos etiquetados, fine-tuning y muchas reglas son ruido.
 
 **Privacidad:** no versionar TIFF ni gold con datos personales en el
 repo; guardar en disco/Vault aparte (como en los LEEME de
-`backup/parte8-servidor-fisico` y `backup/parte10-servidor-fisico`).
+`pruebas/lote1-1251/parte-08/servidor` y `pruebas/lote1-1251/parte-10/servidor`).
 
 ---
 
@@ -155,7 +155,7 @@ repo; guardar en disco/Vault aparte (como en los LEEME de
 
 ## 4. Infra y redeploy
 
-- Empaquetar cada hito medido en `backup/parteN-servidor-fisico/`
+- Empaquetar cada hito medido en `pruebas/<lote>/parte-NN/servidor/`
   (workers, scripts, LEEME con Mermaid, MANIFEST) como Parte 8/10.
 - Flags ya útiles: `LEER_DIGITOS`, `LEER_CASILLAS`, `LEER_DIRECCION`,
   `DIGITOS_LEER_FIJO`, contacto/apellido OFF por defecto.
@@ -172,7 +172,7 @@ repo; guardar en disco/Vault aparte (como en los LEEME de
 2. Wall-clock → docs/h (no inventar throughput).
 3. `compare_gold_real.py` vs **gold** y **gold_v2**.
 4. Tabla por campo (exact match) + casos problemáticos (tipo 0042).
-5. Documento `docs/parteN-resultados.md` + decisión explícita:
+5. Documento `pruebas/<lote>/parte-NN/resultados.md` + decisión explícita:
    ¿reemplaza KPI del visor o solo queda en rama?
 
 No publicar en el visor un Parte con KPI global peor o igual “por
@@ -196,10 +196,10 @@ jitter” presentándolo como mejora.
 
 ## 7. Referencias en el repo
 
-- `docs/parte8-resultados.md` … `docs/parte11-resultados.md` (si está
+- `pruebas/lote1-1251/parte-08/resultados.md` … `pruebas/lote1-1251/parte-11/resultados.md` (si está
   mergeado; si no, rama `cursor/parte11-casillas-throughput-b8cd`)
-- `backup/parte8-servidor-fisico/LEEME.md` — flujo + Mermaid Parte 8
-- `backup/parte10-servidor-fisico/LEEME.md` — dígitos, doc_id, vs P8
+- `pruebas/lote1-1251/parte-08/servidor/LEEME.md` — flujo + Mermaid Parte 8
+- `pruebas/lote1-1251/parte-10/servidor/LEEME.md` — dígitos, doc_id, vs P8
 - Workers clave: `ocr_worker.py`, `nlp_worker.py`, `digitos_vision.py`,
   `casillas_vision.py`, `direccion_vision.py`
 

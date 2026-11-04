@@ -18,7 +18,7 @@ Extraer campos estructurados de formularios E3/E4 escaneados con **≥80% de con
 | **Throughput Parte 15** | ~934 docs/h (Qwen3.6-27B-FP8 dual) |
 | **Hardware** | 2× RTX PRO 6000 Blackwell (96 GB VRAM c/u) |
 
-Detalle: [`docs/lote2-e3v2-parte15.md`](docs/lote2-e3v2-parte15.md). Visor: https://shell931.github.io/e3-pages/
+Detalle: [`pruebas/lote2-e3v2/parte-15/resultados.md`](pruebas/lote2-e3v2/parte-15/resultados.md). Visor: https://shell931.github.io/e3-pages/
 
 ## 🚀 Deploy Rápido
 
@@ -56,14 +56,19 @@ caso-1-v2-e3/
 
 ## 📖 Documentación
 
-- **[Despliegue vigente en servidor físico (2× GPU) — Parte 14](backup/parte-14-servidor-fisico/DESPLIEGUE.md)** (bundle completo: compose fijado, workers, scripts de operación; ver [LEEME](backup/parte-14-servidor-fisico/LEEME.md))
-- [Parte 14 — Lote E3V2, 256 formularios con funcionario](docs/lote2-e3v2-parte14.md)
-- [Parte 8 — resultados, modelos y handoff](docs/parte8-resultados.md) (fuente de la corrida publicada en el visor)
-- [Parte 9 — gold_v2 teléfonos + discapacidad](docs/parte9-resultados.md)
-- [Backup para reinstalar en un servidor físico](backup/parte8-servidor-fisico/LEEME.md) (incluye [PARTE9.md](backup/parte8-servidor-fisico/PARTE9.md))
-- [Deploy Completo](docs/deploy-completo-aws.md)
-- [Arquitectura](docs/arquitectura-parte4.txt)
+- **[Índice de pruebas](pruebas/README.md)**: todas las Partes por lote, con su KPI y su entrada en el visor.
+- [Planteamientos de infraestructura](planteamientos/README.md), por ejemplo el [Dell RTX 8000](planteamientos/rtx-8000/README.md).
+- **[Despliegue oficial — Parte 15](pruebas/lote2-e3v2/parte-15/servidor/DESPLIEGUE.md)**: bundle completo con compose fijado, workers y scripts de operación.
+- [Despliegue Parte 14](pruebas/lote2-e3v2/parte-14/servidor/DESPLIEGUE.md) (7B, 92,4 %).
 - [Deploy Rápido](README-DEPLOY.md)
+
+```
+pruebas/
+  lote1-1251/parte-NN/     ← 1.251 frentes, gold / gold_v2 (Partes 4, 8–12)
+  lote2-e3v2/parte-NN/     ← 267 frentes E3V2, gold_e3 (Partes 10a–e, 14, 15, 16)
+planteamientos/
+  rtx-8000/                ← Dell R740xd, 2× Quadro RTX 8000
+```
 
 ---
 
